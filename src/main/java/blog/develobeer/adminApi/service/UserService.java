@@ -72,7 +72,7 @@ public class UserService implements UserDetailsService {
             }
         };
 
-        return null;
+        return userDetails;
     }
 
     public User save(User user){
