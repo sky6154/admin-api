@@ -28,7 +28,6 @@ public class AdminController {
         User user = new User();
         user.setId("kokj");
         user.setPwd(passwordEncoder.encode("test"));
-        user.setRoleId(1);
 
         System.out.println(user.getId());
         System.out.println(user.getPwd());

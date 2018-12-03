@@ -22,9 +22,6 @@ public class User {
     @Column
     private String pwd;
 
-    @Column(name = "role_id")
-    private Integer roleId;
-
     @Column
     private String description;
 
