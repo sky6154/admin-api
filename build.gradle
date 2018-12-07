@@ -41,6 +41,9 @@ dependencies {
     compile('com.google.code.gson:gson:2.8.2')
 
     compile("org.springframework.boot:spring-boot-starter-security")
+
+    compile("org.springframework.session:spring-session-data-redis")
+    compile("io.lettuce:lettuce-core")
 }
 
 task wrapper(type: Wrapper) {
