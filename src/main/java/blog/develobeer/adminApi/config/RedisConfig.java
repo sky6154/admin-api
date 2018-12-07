@@ -8,11 +8,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
-import java.io.Serializable;
-
 @EnableRedisHttpSession
-public class RedisConfig implements Serializable {
-
+public class RedisConfig {
     @Value("${spring.redis.host}")
     private String redisHost;
 

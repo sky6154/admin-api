@@ -4,12 +4,13 @@ import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 @Data
 @Entity
 @Table(name="user_role")
-public class UserRole {
+public class UserRole implements Serializable {
     @EmbeddedId
     private UserRoleId userRoleId;
 
