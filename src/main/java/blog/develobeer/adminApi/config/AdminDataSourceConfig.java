@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,7 +25,7 @@ import java.util.Map;
         entityManagerFactoryRef = "adminEntityManagerFactory",
         transactionManagerRef = "adminTransactionManager",
         basePackages = {"blog.develobeer.adminApi.dao.admin"})
-public class AdminDataSourceConfig {
+public class AdminDataSourceConfig implements Serializable {
 
     protected Map<String, Object> jpaProperties() {
         Map<String, Object> props = new HashMap<>();

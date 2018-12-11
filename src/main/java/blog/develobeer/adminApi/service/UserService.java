@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserService implements UserDetailsService, Serializable {
+    private static final long serialVersionUID = 1L;
+
     @Autowired
     UserRepository userRepository;
 

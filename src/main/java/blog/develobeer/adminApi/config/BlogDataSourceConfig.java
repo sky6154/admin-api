@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,7 +25,7 @@ import java.util.Map;
 @EnableTransactionManagement
 @EnableJpaRepositories(
         basePackages = {"blog.develobeer.adminApi.dao.blog"})
-public class BlogDataSourceConfig {
+public class BlogDataSourceConfig implements Serializable {
 
     protected Map<String, Object> jpaProperties() {
         Map<String, Object> props = new HashMap<>();
