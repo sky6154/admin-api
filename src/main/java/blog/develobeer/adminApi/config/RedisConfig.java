@@ -9,16 +9,13 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericToStringSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import org.springframework.session.data.redis.RedisOperationsSessionRepository;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 import org.springframework.session.web.http.HeaderHttpSessionIdResolver;
 import org.springframework.session.web.http.HttpSessionIdResolver;
 
-import java.io.Serializable;
-
 @Configuration
-@EnableRedisHttpSession
-public class RedisConfig implements Serializable {
+@EnableRedisHttpSession(maxInactiveIntervalInSeconds = 3600 * 3)
+public class RedisConfig {
     @Value("${spring.redis.host}")
     private String redisHost;
 

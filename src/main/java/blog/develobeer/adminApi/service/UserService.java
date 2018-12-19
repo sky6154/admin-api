@@ -40,7 +40,7 @@ public class UserService implements UserDetailsService, Serializable {
 
                         return userRoles
                                 .stream()
-                                .map(userRole -> new SimpleGrantedAuthority(userRole.getRole()))
+                                .map(userRole -> new SimpleGrantedAuthority("ROLE_" + userRole.getRole()))
                                 .collect(Collectors.toList());
                     }
 

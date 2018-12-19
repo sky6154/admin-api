@@ -4,6 +4,8 @@ import blog.develobeer.adminApi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -11,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -18,32 +21,23 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private UserService userService;
-//
-//    @Autowired
-//    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-//        auth.inMemoryAuthentication().withUser(User.withUsername("user")
-//                .password("{noop}password").roles("USER").build());
-//    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                .csrf()
+                    .disable()
+                .sessionManagement()
+                    .sessionCreationPolicy(SessionCreationPolicy.NEVER)
                 .and()
-                .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/", "/home", "/test").permitAll()
-                .antMatchers("/admin/**").hasAnyAuthority("ADMIN", "ETC")
+                    .antMatchers("/", "/home", "/test", "/login").permitAll()
+                    .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                    .antMatchers("/admin/**").hasAnyAuthority("ROLE_ADMIN") // do not need prefix ROLE_
                     .anyRequest().authenticated()
-                    .and()
-                    .formLogin()
-//                .loginPage("/login")
-                    .permitAll()
-                    .and()
+                .and()
                 .logout()
-                .logoutUrl("/logout")
-                    .logoutSuccessUrl("/home")
-                    .permitAll();
+                    .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler());
     }
 
     @Override
@@ -56,5 +50,14 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
 
+//    @Bean
+//    GrantedAuthorityDefaults grantedAuthorityDefaults() {
+//        return new GrantedAuthorityDefaults(""); // Remove the ROLE_ prefix
+//    }
 }
