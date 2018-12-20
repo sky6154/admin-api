@@ -11,8 +11,6 @@ import java.sql.Timestamp;
 @Entity
 @Table(name="user_role")
 public class UserRole implements Serializable {
-    private static final long serialVersionUID = 1L;
-
     @EmbeddedId
     private UserRoleId userRoleId;
 

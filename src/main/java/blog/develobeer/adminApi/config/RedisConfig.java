@@ -48,9 +48,4 @@ public class RedisConfig {
     RedisSerializer<Object> springSessionDefaultRedisSerializer() {
         return new CustomRedisSerializer();
     }
-
-    @Bean
-    public HttpSessionIdResolver httpSessionIdResolver() {
-        return HeaderHttpSessionIdResolver.xAuthToken();
-    }
 }

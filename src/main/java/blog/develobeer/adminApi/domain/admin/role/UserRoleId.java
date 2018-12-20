@@ -9,8 +9,6 @@ import java.io.Serializable;
 @Embeddable
 @Data
 public class UserRoleId implements Serializable {
-    private static final long serialVersionUID = 1L;
-
     @Column(name="user_seq")
     private Integer userSeq;
 

@@ -1,6 +1,4 @@
-//package blog.develobeer.adminApi.service;
-//
-//import java.io.Serializable;
-//
-//public class AdminService implements Serializable {
-//}
+package blog.develobeer.adminApi.service;
+
+public class AdminService {
+}
