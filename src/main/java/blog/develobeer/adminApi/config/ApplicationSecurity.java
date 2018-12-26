@@ -32,7 +32,9 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
                 .csrf()
                     .disable()
                 .sessionManagement()
-                    .maximumSessions(1).and()
+//                    .maximumSessions(1)
+//                    .maxSessionsPreventsLogin(true)
+//                    .and()
                     .sessionCreationPolicy(SessionCreationPolicy.NEVER)
                 .and()
                 .authorizeRequests()
@@ -42,6 +44,7 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
                     .anyRequest().authenticated()
                 .and()
                 .logout()
+                    .logoutUrl("/logout")
                     .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler());
     }
 

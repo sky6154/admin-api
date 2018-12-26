@@ -14,7 +14,7 @@ import org.springframework.session.web.http.HeaderHttpSessionIdResolver;
 import org.springframework.session.web.http.HttpSessionIdResolver;
 
 @Configuration
-@EnableRedisHttpSession(maxInactiveIntervalInSeconds = 3600 * 3)
+@EnableRedisHttpSession(maxInactiveIntervalInSeconds = 3600 * 1)
 public class RedisConfig {
     @Value("${spring.redis.host}")
     private String redisHost;
