@@ -1,10 +1,8 @@
 package blog.develobeer.adminApi.controller.blog;
 
-import blog.develobeer.adminApi.domain.blog.CustomMultipart;
 import blog.develobeer.adminApi.domain.common.CustomResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,12 +20,10 @@ public class PostController {
     private static String UPLOAD_ROOT = "D://temp//";
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
-    public List<CustomResult> upload(CustomMultipart customMultipart) {
-        System.out.println(customMultipart.toString());
-
+    public List<CustomResult> upload(MultipartFile[] files) {
         ArrayList<CustomResult> result = new ArrayList<>();
 
-        if (customMultipart.getFiles() == null || customMultipart.getFiles().isEmpty()) {
+        if (files == null || files.length < 1) {
             result.add(new CustomResult(-1, "File doesn't exist !!"));
         } else {
             // 경로(폴더)가 없을 경우 생성
@@ -41,17 +37,17 @@ public class PostController {
             }
 
             // 파일 저장
-            for (MultipartFile file : customMultipart.getFiles()) {
+            for(MultipartFile multipartFile : files){
                 try {
-                    byte[] bytes = file.getBytes();
+                    byte[] bytes = multipartFile.getBytes();
 
-                    Path path = Paths.get(UPLOAD_ROOT + file.getOriginalFilename());
+                    Path path = Paths.get(UPLOAD_ROOT + multipartFile.getOriginalFilename());
                     Files.write(path, bytes);
 
-                    CustomResult customResult = new CustomResult(1, "File is successfully uploaded : " + file.getOriginalFilename());
+                    CustomResult customResult = new CustomResult(1, "File is successfully uploaded : " + multipartFile.getOriginalFilename());
                     HashMap<String, String> map = new HashMap<>();
 
-                    map.put("file name", file.getOriginalFilename());
+                    map.put("file name", multipartFile.getOriginalFilename());
                     map.put("path", UPLOAD_ROOT);
 
                     customResult.setAdditional(map);
@@ -59,7 +55,7 @@ public class PostController {
                     result.add(customResult);
                 } catch (IOException e) {
                     e.printStackTrace();
-                    result.add(new CustomResult(-3, "Fail to upload : " + file.getOriginalFilename()));
+                    result.add(new CustomResult(-3, "Fail to upload : " + multipartFile.getOriginalFilename()));
                 }
             }
         }
