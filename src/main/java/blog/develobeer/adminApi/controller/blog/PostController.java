@@ -19,7 +19,7 @@ import java.util.List;
 public class PostController {
     private static String UPLOAD_ROOT = "D://temp//";
 
-    @RequestMapping(value = "/upload", method = RequestMethod.POST)
+    @RequestMapping(value = "/fileUpload", method = RequestMethod.POST)
     public List<CustomResult> upload(MultipartFile[] files) {
         ArrayList<CustomResult> result = new ArrayList<>();
 
@@ -47,7 +47,7 @@ public class PostController {
                     CustomResult customResult = new CustomResult(1, "File is successfully uploaded : " + multipartFile.getOriginalFilename());
                     HashMap<String, String> map = new HashMap<>();
 
-                    map.put("file name", multipartFile.getOriginalFilename());
+                    map.put("fileName", multipartFile.getOriginalFilename());
                     map.put("path", UPLOAD_ROOT);
 
                     customResult.setAdditional(map);
