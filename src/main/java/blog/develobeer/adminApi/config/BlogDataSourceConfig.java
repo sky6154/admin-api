@@ -1,6 +1,5 @@
 package blog.develobeer.adminApi.config;
 
-
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -50,7 +49,7 @@ public class BlogDataSourceConfig implements Serializable {
             EntityManagerFactoryBuilder builder, @Qualifier("dataSource") DataSource dataSource) {
         return builder
                 .dataSource(dataSource)
-                .packages("blog.develobeer.api.domain.blog")
+                .packages("blog.develobeer.adminApi.domain.blog")
                 .persistenceUnit("blog")
                 .properties(this.jpaProperties())
                 .build();

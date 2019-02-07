@@ -1,12 +1,12 @@
-package blog.develobeer.adminApi.domain.admin.role;
+package blog.develobeer.adminApi.domain.blog;
 
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
 import java.sql.Timestamp;
@@ -14,14 +14,17 @@ import java.sql.Timestamp;
 @Setter
 @Getter
 @Entity
-@Table(name="user_role")
-public class UserRole implements Serializable {
-    @EmbeddedId
-    private UserRoleId userRoleId;
+@Table(name="blog_board")
+public class BlogBoard implements Serializable {
+    @Id
+    @Column(name="board_id")
+    private Integer boardId;
 
-    private String id;
+    @Column
+    private String description;
 
-    private String role;
+    @Column(name="is_open")
+    private Boolean isOpen;
 
     @CreationTimestamp
     @Column(name="reg_date")

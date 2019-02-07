@@ -5,8 +5,8 @@ import lombok.Setter;
 
 import java.util.Collection;
 
-@Getter
 @Setter
+@Getter
 public class AuthenticationToken {
     private String username;
     private Collection authorities;

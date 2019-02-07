@@ -38,7 +38,7 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
                     .sessionCreationPolicy(SessionCreationPolicy.NEVER)
                 .and()
                 .authorizeRequests()
-                    .antMatchers("/", "/home", "/test", "/login", "/post/**").permitAll()
+                    .antMatchers("/", "/home", "/test", "/login", "/post/**", "/board/**").permitAll()
                     .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                     .antMatchers("/admin/**").hasAnyAuthority("ROLE_ADMIN")
                     .anyRequest().authenticated()
