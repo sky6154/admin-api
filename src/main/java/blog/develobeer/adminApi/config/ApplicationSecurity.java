@@ -15,26 +15,36 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.savedrequest.NullRequestCache;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
+import org.springframework.session.FindByIndexNameSessionRepository;
+import org.springframework.session.Session;
+import org.springframework.session.SessionRepository;
+import org.springframework.session.data.redis.RedisOperationsSessionRepository;
+import org.springframework.session.security.SpringSessionBackedSessionRegistry;
 import org.springframework.session.web.http.HeaderHttpSessionIdResolver;
 import org.springframework.session.web.http.HttpSessionIdResolver;
 
 @Configuration
 @EnableWebSecurity
-public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
+public class ApplicationSecurity<S extends Session> extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private UserService userService;
+
+//    @Autowired
+//    private FindByIndexNameSessionRepository<S> sessionRepository;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf()
-                    .disable()
+                .disable()
                 .sessionManagement()
-//                    .maximumSessions(1)
+                    .maximumSessions(1)
 //                    .maxSessionsPreventsLogin(true)
-//                    .and()
+//                    .sessionRegistry(sessionRegistry())
+                .and()
                     .sessionCreationPolicy(SessionCreationPolicy.NEVER)
                 .and()
                 .authorizeRequests()
@@ -45,8 +55,14 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout()
                     .logoutUrl("/logout")
-                    .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler());
+                    .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
+                    .invalidateHttpSession(true);
     }
+
+//    @Bean
+//    public SpringSessionBackedSessionRegistry<S> sessionRegistry() {
+//        return new SpringSessionBackedSessionRegistry<>(this.sessionRepository);
+//    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -62,11 +78,6 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
-    }
-
-    @Bean
-    public HttpSessionIdResolver httpSessionIdResolver() {
-        return HeaderHttpSessionIdResolver.xAuthToken();
     }
 //
 //    @Bean
