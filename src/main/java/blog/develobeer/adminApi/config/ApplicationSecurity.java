@@ -24,45 +24,47 @@ import org.springframework.session.data.redis.RedisOperationsSessionRepository;
 import org.springframework.session.security.SpringSessionBackedSessionRegistry;
 import org.springframework.session.web.http.HeaderHttpSessionIdResolver;
 import org.springframework.session.web.http.HttpSessionIdResolver;
+import org.springframework.session.web.http.SessionRepositoryFilter;
 
 @Configuration
 @EnableWebSecurity
-public class ApplicationSecurity<S extends Session> extends WebSecurityConfigurerAdapter {
+public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private UserService userService;
 
-//    @Autowired
-//    private FindByIndexNameSessionRepository<S> sessionRepository;
+    @Autowired
+    FindByIndexNameSessionRepository<? extends Session> sessionRepository;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf()
                 .disable()
+//                .formLogin().and()
                 .sessionManagement()
                     .maximumSessions(1)
+                    .sessionRegistry(sessionRegistry())
 //                    .maxSessionsPreventsLogin(true)
-//                    .sessionRegistry(sessionRegistry())
                 .and()
-                    .sessionCreationPolicy(SessionCreationPolicy.NEVER)
+                    .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 .and()
                 .authorizeRequests()
-                    .antMatchers("/", "/home", "/test", "/login", "/post/**", "/board/**").permitAll()
+                    .antMatchers("/", "/home", "/test", "/login", "/post/**", "/board/**", "/temp").permitAll()
                     .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                     .antMatchers("/admin/**").hasAnyAuthority("ROLE_ADMIN")
-                    .anyRequest().authenticated()
-                .and()
-                .logout()
-                    .logoutUrl("/logout")
-                    .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
-                    .invalidateHttpSession(true);
+                    .anyRequest().authenticated();
+//                .and()
+//                .logout()
+//                    .logoutUrl("/logout")
+//                    .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
+//                    .invalidateHttpSession(true);
     }
 
-//    @Bean
-//    public SpringSessionBackedSessionRegistry<S> sessionRegistry() {
-//        return new SpringSessionBackedSessionRegistry<>(this.sessionRepository);
-//    }
+    @Bean
+    public SpringSessionBackedSessionRegistry sessionRegistry() {
+        return new SpringSessionBackedSessionRegistry(this.sessionRepository);
+    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
