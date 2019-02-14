@@ -21,10 +21,10 @@ import java.util.stream.Collectors;
 @Service
 public class UserService implements UserDetailsService {
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    UserRoleRepository userRoleRepository;
+    private UserRoleRepository userRoleRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

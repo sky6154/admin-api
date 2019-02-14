@@ -14,6 +14,7 @@ import org.springframework.session.FindByIndexNameSessionRepository;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.util.Base64;
 
 @RestController
 @RequestMapping("/")
@@ -32,55 +33,23 @@ public class BasicController {
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public AuthenticationToken login(@RequestBody AuthenticationRequest authenticationRequest, HttpSession session) {
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword());
-        Authentication authentication = authenticationManager.authenticate(token);
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword());
+        Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+
+//        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
 
-//        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-
-        System.out.println("########");
-        System.out.println(authentication.getPrincipal());
-        System.out.println(authentication.getName());
-        System.out.println(authentication.getAuthorities());
-
-        System.out.println("#############");
-        System.out.println(SecurityContextHolder.getContext().getAuthentication().getName());
-        System.out.println(SecurityContextHolder.getContext().getAuthentication().getAuthorities());
-
         session.setAttribute(FindByIndexNameSessionRepository.PRINCIPAL_NAME_INDEX_NAME, authentication.getName());
+
+        String makeOneString = authentication.getName() + ":" + session.getId();
+        String token = Base64.getEncoder().encodeToString(makeOneString.getBytes());
 
 //        SecurityContextHolder.getContext().setAuthentication(authentication);
 //        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
 
-        return new AuthenticationToken(authentication.getName(), authentication.getAuthorities(), session.getId());
+        return new AuthenticationToken(authentication.getName(), authentication.getAuthorities(), token);
     }
-
-    @RequestMapping(value = "/temp", method = RequestMethod.GET)
-    public String temp() {
-
-        System.out.println("#######");
-        System.out.println(SecurityContextHolder.getContext().getAuthentication().getName());
-        System.out.println(SecurityContextHolder.getContext().getAuthentication().getAuthorities());
-
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        String username;
-
-        if (principal instanceof UserDetails) {
-            username = ((UserDetails)principal).getUsername();
-        } else {
-            username = principal.toString();
-        }
-
-        System.out.println("###");
-        System.out.println(username);
-
-        return SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString();
-    }
-
-
 }

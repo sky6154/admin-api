@@ -19,7 +19,7 @@ import java.util.List;
 public class PostService {
 
     @Autowired
-    BlogPostRepository blogPostRepository;
+    private BlogPostRepository blogPostRepository;
 
     private static String UPLOAD_ROOT = "D://temp//";
 

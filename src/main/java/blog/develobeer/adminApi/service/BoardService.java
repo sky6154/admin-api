@@ -12,10 +12,10 @@ import java.util.List;
 public class BoardService {
 
     @Autowired
-    BlogBoardRepository blogBoardRepository;
+    private BlogBoardRepository blogBoardRepository;
 
     @Autowired
-    BlogPostRepository blogPostRepository;
+    private BlogPostRepository blogPostRepository;
 
     public List<BlogBoard> getBoardList(){
         return blogBoardRepository.findAll();
