@@ -20,7 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
 
@@ -66,10 +65,8 @@ public class CustomTokenAuthenticationFilter extends AbstractAuthenticationProce
             return null;
         }
 
-        byte[] decodedBytes = Base64.getDecoder().decode(token);
-        String decodedString = new String(decodedBytes);
-
-        String[] info = this.splitToken(decodedString);
+        String decodedString = DevelobeerAuthenticationToken.decode(token);
+        String[] info = DevelobeerAuthenticationToken.splitToken(decodedString);
 
         if(info.length < 1){
             throw new AuthenticationCredentialsNotFoundException("Token is not found.");
@@ -117,13 +114,6 @@ public class CustomTokenAuthenticationFilter extends AbstractAuthenticationProce
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
         super.doFilter(req, res, chain);
-    }
-
-
-    public String[] splitToken(String decodedString){
-        String[] info = decodedString.split(":");
-
-        return info;
     }
 
 }

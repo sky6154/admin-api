@@ -1,6 +1,7 @@
 package blog.develobeer.adminApi.config;
 
 import blog.develobeer.adminApi.filter.CustomTokenAuthenticationFilter;
+import blog.develobeer.adminApi.filter.MyLogoutSuccessHandler;
 import blog.develobeer.adminApi.filter.RestAuthenticationEntryPoint;
 import blog.develobeer.adminApi.service.TokenService;
 import blog.develobeer.adminApi.service.UserService;
@@ -17,7 +18,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -53,7 +53,11 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf()
-                .disable()
+                    .disable()
+                .httpBasic().disable()
+//                .requestCache()
+//                    .requestCache(new NullRequestCache())
+//                    .and()
                 .sessionManagement()
                     .maximumSessions(1)
                     .sessionRegistry(sessionRegistry())
@@ -61,21 +65,22 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
                     .and()
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .and()
-                .exceptionHandling()
-                .authenticationEntryPoint(restAuthenticationEntryPoint)
-                .and()
                 .addFilterBefore(customTokenAuthenticationFilter(AUTHENTICATION_REQUIRED_PATTERN), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                    .antMatchers("/", "/home", "/test", "/login", "/post/**", "/board/**", "/temp").permitAll()
+                    .antMatchers("/", "/login", "/logout", "/error").permitAll()
                     .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                     .antMatchers(AUTHENTICATION_REQUIRED_PATTERN).hasAnyAuthority("ROLE_ADMIN")
                     .anyRequest().authenticated()
                     .and()
-                .httpBasic().disable()
+                .exceptionHandling()
+                .authenticationEntryPoint(restAuthenticationEntryPoint)
+                .and()
                 .logout()
                     .logoutUrl("/logout")
-                    .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
-                    .invalidateHttpSession(true);
+                    .logoutSuccessHandler(new MyLogoutSuccessHandler(tokenService));
+//                  .invalidateHttpSession(true);
+
+
     }
 
     private CustomTokenAuthenticationFilter customTokenAuthenticationFilter(String[] patterns){
