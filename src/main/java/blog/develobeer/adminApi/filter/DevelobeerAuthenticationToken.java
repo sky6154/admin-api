@@ -1,7 +1,9 @@
 package blog.develobeer.adminApi.filter;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 
 import java.security.Principal;
 import java.util.Base64;
@@ -47,15 +49,13 @@ public class DevelobeerAuthenticationToken extends AbstractAuthenticationToken {
 
     public static String encode(String id, String sessionId){
         String makeOneString = id + ":" + sessionId;
-        String token = Base64.getEncoder().encodeToString(makeOneString.getBytes());
+        String token = TokenManager.encrypt(makeOneString);
 
         return token;
     }
 
     public static String decode(String token){
-        byte[] decodedBytes = Base64.getDecoder().decode(token);
-        return new String(decodedBytes);
+        return TokenManager.decrypt(token);
     }
-
 
 }

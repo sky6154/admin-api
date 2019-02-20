@@ -80,11 +80,10 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
                     .logoutSuccessHandler(new MyLogoutSuccessHandler(tokenService));
 //                  .invalidateHttpSession(true);
 
-
     }
 
     private CustomTokenAuthenticationFilter customTokenAuthenticationFilter(String[] patterns){
-        return new CustomTokenAuthenticationFilter(getRequiredAuthPath(patterns), this.authenticationManager, this.tokenService, this.userService);
+        return new CustomTokenAuthenticationFilter(getRequiredAuthPath(patterns), this.authenticationManager);
     }
 
     public OrRequestMatcher getRequiredAuthPath(String[] patterns){

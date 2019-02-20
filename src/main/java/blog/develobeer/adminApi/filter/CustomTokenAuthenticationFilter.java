@@ -1,9 +1,12 @@
 package blog.develobeer.adminApi.filter;
 
+import antlr.Token;
+import blog.develobeer.adminApi.service.PostService;
 import blog.develobeer.adminApi.service.TokenService;
 import blog.develobeer.adminApi.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -11,11 +14,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.session.Session;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -28,16 +31,16 @@ public class CustomTokenAuthenticationFilter extends AbstractAuthenticationProce
     private static final Logger logger = LoggerFactory.getLogger(CustomTokenAuthenticationFilter.class);
     public final String HEADER_SECURITY_TOKEN = "X-Develobeer-Token";
 
+    @Autowired
     private TokenService tokenService;
+
+    @Autowired
     private UserService userService;
 
-    public CustomTokenAuthenticationFilter(RequestMatcher requestMatcher, AuthenticationManager authenticationManager, TokenService tokenService, UserService userService) {
+    public CustomTokenAuthenticationFilter(RequestMatcher requestMatcher, AuthenticationManager authenticationManager) {
         super(requestMatcher);
         setAuthenticationManager(authenticationManager);
         setAuthenticationSuccessHandler(new TokenSimpleUrlAuthenticationSuccessHandler());
-
-        this.tokenService = tokenService;
-        this.userService = userService;
     }
 
     /**
@@ -113,6 +116,18 @@ public class CustomTokenAuthenticationFilter extends AbstractAuthenticationProce
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+        if(tokenService==null){
+            ServletContext servletContext = req.getServletContext();
+            WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
+            tokenService = webApplicationContext.getBean(TokenService.class);
+        }
+
+        if(userService==null){
+            ServletContext servletContext = req.getServletContext();
+            WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
+            userService = webApplicationContext.getBean(UserService.class);
+        }
+
         super.doFilter(req, res, chain);
     }
 
