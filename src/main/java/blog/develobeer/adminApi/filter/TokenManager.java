@@ -21,10 +21,10 @@ public class TokenManager {
     @Autowired
     public void setPrivateKey(@Value("${key.private-key}") String privateKey){
         try{
-            String privateKeyContent = privateKey.replaceAll("\\n", "").replace("-----BEGIN PRIVATE KEY-----", "").replace("-----END PRIVATE KEY-----", "");
-
-            System.out.println("###########################");
-            System.out.println(privateKeyContent);
+            String privateKeyContent = privateKey.replaceAll("\\n", "")
+                    .replace("-----BEGIN PRIVATE KEY-----", "")
+                    .replace("-----END PRIVATE KEY-----", "")
+                    .replace(" ", "");
 
             PKCS8EncodedKeySpec keySpecPKCS8 = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKeyContent));
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
@@ -39,10 +39,10 @@ public class TokenManager {
     @Autowired
     public void setPublicKey(@Value("${key.public-key}") String publicKey){
         try{
-            String publicKeyContent = publicKey.replaceAll("\\n", "").replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "");;
-
-            System.out.println("###########################");
-            System.out.println(publicKeyContent);
+            String publicKeyContent = publicKey.replaceAll("\\n", "")
+                    .replace("-----BEGIN PUBLIC KEY-----", "")
+                    .replace("-----END PUBLIC KEY-----", "")
+                    .replace(" ", "");
 
             X509EncodedKeySpec keySpecX509 = new X509EncodedKeySpec(Base64.getDecoder().decode(publicKeyContent));
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
@@ -59,8 +59,7 @@ public class TokenManager {
             Cipher cipher = Cipher.getInstance("RSA");
             cipher.init(Cipher.ENCRYPT_MODE, publicKey);
 
-            byte[] bytePlain = cipher.doFinal(plainText.getBytes());
-
+            byte[] bytePlain = cipher.doFinal(plainText.getBytes(StandardCharsets.UTF_8));
             String encrypted = Base64.getEncoder().encodeToString(bytePlain);
 
             return encrypted;
@@ -75,12 +74,10 @@ public class TokenManager {
     public static String decrypt(String encryptedText){
         try {
             Cipher cipher = Cipher.getInstance("RSA");
-            byte[] byteEncrypted = Base64.getDecoder().decode(encryptedText.getBytes());
-
             cipher.init(Cipher.DECRYPT_MODE, privateKey);
 
+            byte[] byteEncrypted = Base64.getDecoder().decode(encryptedText.getBytes(StandardCharsets.UTF_8));
             byte[] bytePlain = cipher.doFinal(byteEncrypted);
-
             String decrypted = new String(bytePlain, "utf-8");
 
             return decrypted;
