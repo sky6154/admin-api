@@ -1,7 +1,5 @@
 package blog.develobeer.adminApi.filter;
 
-import antlr.Token;
-import blog.develobeer.adminApi.service.PostService;
 import blog.develobeer.adminApi.service.TokenService;
 import blog.develobeer.adminApi.service.UserService;
 import org.slf4j.Logger;
@@ -15,7 +13,6 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.session.Session;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.*;
@@ -69,6 +66,11 @@ public class CustomTokenAuthenticationFilter extends AbstractAuthenticationProce
         }
 
         String decodedString = DevelobeerAuthenticationToken.decode(token);
+
+        if(decodedString == null){
+            throw new AuthenticationServiceException("Invalid token");
+        }
+
         String[] info = DevelobeerAuthenticationToken.splitToken(decodedString);
 
         if(info.length < 1){
@@ -87,7 +89,7 @@ public class CustomTokenAuthenticationFilter extends AbstractAuthenticationProce
                 Session session = result.get(sessionId);
 
                 if(session == null){
-                    throw new CredentialsExpiredException("Token is not valid.");
+                    throw new CredentialsExpiredException("Token is invalid.");
                 }
 
                 if(session.isExpired()){

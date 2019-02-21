@@ -16,7 +16,6 @@ import org.springframework.session.Session;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
-import java.util.Base64;
 import java.util.Map;
 
 @Service

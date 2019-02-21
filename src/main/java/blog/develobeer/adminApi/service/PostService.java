@@ -4,6 +4,7 @@ import blog.develobeer.adminApi.dao.blog.BlogPostRepository;
 import blog.develobeer.adminApi.domain.blog.BlogPost;
 import blog.develobeer.adminApi.domain.common.CustomResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,7 +22,19 @@ public class PostService {
     @Autowired
     private BlogPostRepository blogPostRepository;
 
-    private static String UPLOAD_ROOT = "D://temp//";
+    private static String UPLOAD_ROOT;
+    private static String ACCESS_ADDR;
+
+    @Autowired
+    public void setUploadRoot(@Value("${path.upload-root}") String uploadRoot){
+        this.UPLOAD_ROOT = uploadRoot;
+    }
+
+    @Autowired
+    public void setAccessAddr(@Value("${path.access-addr}") String accessAddr){
+        this.ACCESS_ADDR = accessAddr;
+    }
+
 
     /**
      * 이미지 업로드
@@ -60,7 +73,7 @@ public class PostService {
                     HashMap<String, String> map = new HashMap<>();
 
                     map.put("fileName", multipartFile.getOriginalFilename());
-                    map.put("path", UPLOAD_ROOT);
+                    map.put("path", ACCESS_ADDR);
 
                     customResult.setAdditional(map);
 

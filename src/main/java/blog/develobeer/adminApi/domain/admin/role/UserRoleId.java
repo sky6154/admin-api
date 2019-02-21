@@ -1,6 +1,5 @@
 package blog.develobeer.adminApi.domain.admin.role;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 

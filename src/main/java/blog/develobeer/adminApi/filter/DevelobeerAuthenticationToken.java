@@ -1,12 +1,9 @@
 package blog.develobeer.adminApi.filter;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
 
 import java.security.Principal;
-import java.util.Base64;
 import java.util.Collection;
 
 public class DevelobeerAuthenticationToken extends AbstractAuthenticationToken {
