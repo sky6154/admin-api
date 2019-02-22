@@ -67,7 +67,7 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
                     .and()
                 .addFilterBefore(customTokenAuthenticationFilter(AUTHENTICATION_REQUIRED_PATTERN), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                    .antMatchers("/", "/login", "/logout", "/error").permitAll()
+                    .antMatchers("/", "/login", "/logout", "/error", "/authCheck").permitAll()
                     .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                     .antMatchers(AUTHENTICATION_REQUIRED_PATTERN).hasAnyAuthority("ROLE_ADMIN")
                     .anyRequest().authenticated()

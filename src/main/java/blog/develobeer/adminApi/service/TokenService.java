@@ -4,18 +4,19 @@ import blog.develobeer.adminApi.domain.admin.user.AuthenticationRequest;
 import blog.develobeer.adminApi.domain.admin.user.AuthenticationToken;
 import blog.develobeer.adminApi.filter.DevelobeerAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.CredentialsExpiredException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.session.FindByIndexNameSessionRepository;
 import org.springframework.session.Session;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
+import java.util.Collection;
+import java.util.Date;
 import java.util.Map;
 
 @Service
@@ -25,6 +26,9 @@ public class TokenService<S extends Session> {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private UserService userService;
 
     public Map<String, ? extends Session> getSessionByName(String name){
         return sessionRepository.findByPrincipalName(name);
@@ -99,5 +103,59 @@ public class TokenService<S extends Session> {
                 }
             }
         }
+    }
+
+
+    public Collection<? extends GrantedAuthority> authCheck(String token) {
+        if(token == null) {
+            return null;
+        }
+
+        String decodedString = DevelobeerAuthenticationToken.decode(token);
+
+        if(decodedString == null){
+            throw new AuthenticationServiceException("Invalid token");
+        }
+
+        String[] info = DevelobeerAuthenticationToken.splitToken(decodedString);
+
+        if(info.length < 1){
+            throw new AuthenticationCredentialsNotFoundException("Token is not found.");
+        }
+        else{
+            String userName = info[0];
+            String sessionId = info[1];
+
+            Map<String, ? extends Session> result = this.getSessionByName(userName);
+
+            if(result.size() < 1){
+                throw new AuthenticationCredentialsNotFoundException("Token is not found.");
+            }
+            else{
+                Session session = result.get(sessionId);
+
+                if(session == null){
+                    throw new CredentialsExpiredException("Token is invalid.");
+                }
+
+                if(session.isExpired()){
+                    throw new CredentialsExpiredException("Token is expired.");
+                }
+                else{
+                    session.setLastAccessedTime(new Date().toInstant());
+                    this.updateAccessTime((S) session);
+
+                    UserDetails userDetails = userService.loadUserByUsername(userName);
+
+                    try {
+                        return userDetails.getAuthorities();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 }
