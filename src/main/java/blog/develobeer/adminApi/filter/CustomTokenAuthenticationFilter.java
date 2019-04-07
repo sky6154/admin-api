@@ -45,6 +45,12 @@ public class CustomTokenAuthenticationFilter extends AbstractAuthenticationProce
      */
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
+        // chrome preflight options인 경우 pass 한다.
+        if(request.getMethod().equals("OPTIONS")){
+            response.setStatus(HttpServletResponse.SC_OK);
+            return null;
+        }
+
         String token = request.getHeader(HEADER_SECURITY_TOKEN);
 
         AbstractAuthenticationToken userAuthenticationToken = authUserByToken(token);
