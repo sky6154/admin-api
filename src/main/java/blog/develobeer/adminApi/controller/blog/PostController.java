@@ -5,6 +5,7 @@ import blog.develobeer.adminApi.service.PostService;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -18,8 +19,12 @@ import java.util.Map;
 @RestController
 @RequestMapping("/post")
 public class PostController {
-    @Autowired
-    PostService postService;
+
+    private final PostService postService;
+
+    public PostController(PostService postService){
+        this.postService = postService;
+    }
 
     @RequestMapping(value = "/fileUpload", method = RequestMethod.POST)
     public List<CustomResult> upload(MultipartFile[] files) {

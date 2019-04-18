@@ -13,8 +13,12 @@ import java.util.List;
 @RequestMapping("/board")
 public class BoardController {
 
+    private final BoardService boardService;
+
     @Autowired
-    BoardService boardService;
+    public BoardController(BoardService boardService){
+        this.boardService = boardService;
+    }
 
     @RequestMapping(value = "/getBoardList", method = RequestMethod.GET)
     public List<BlogBoard> getBoardList() {

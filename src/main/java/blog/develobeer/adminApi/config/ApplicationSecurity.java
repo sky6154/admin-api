@@ -19,7 +19,6 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.session.FindByIndexNameSessionRepository;
@@ -33,20 +32,18 @@ import java.util.List;
 @EnableWebSecurity
 public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+    private final FindByIndexNameSessionRepository<? extends Session> sessionRepository;
+    private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
 
     @Autowired
-    FindByIndexNameSessionRepository<? extends Session> sessionRepository;
-
-    @Autowired
-    private TokenService tokenService;
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+    public ApplicationSecurity(UserService userService,
+                               FindByIndexNameSessionRepository<? extends Session> sessionRepository,
+                               RestAuthenticationEntryPoint restAuthenticationEntryPoint){
+        this.userService = userService;
+        this.sessionRepository = sessionRepository;
+        this.restAuthenticationEntryPoint = restAuthenticationEntryPoint;
+    }
 
     private String[] AUTHENTICATION_REQUIRED_PATTERN = {"/admin/**", "/post/**", "/board/**"};
 
@@ -56,9 +53,6 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
                 .csrf()
                     .disable()
                 .httpBasic().disable()
-//                .requestCache()
-//                    .requestCache(new NullRequestCache())
-//                    .and()
                 .sessionManagement()
                     .maximumSessions(1)
                     .sessionRegistry(sessionRegistry())
@@ -78,13 +72,13 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout()
                     .logoutUrl("/logout")
-                    .logoutSuccessHandler(new MyLogoutSuccessHandler(tokenService));
+                    .logoutSuccessHandler(new MyLogoutSuccessHandler());
 //                  .invalidateHttpSession(true);
 
     }
 
-    private CustomTokenAuthenticationFilter customTokenAuthenticationFilter(String[] patterns){
-        return new CustomTokenAuthenticationFilter(getRequiredAuthPath(patterns), this.authenticationManager);
+    private CustomTokenAuthenticationFilter customTokenAuthenticationFilter(String[] patterns) throws Exception {
+        return new CustomTokenAuthenticationFilter(getRequiredAuthPath(patterns), this.authenticationManagerBean());
     }
 
     public OrRequestMatcher getRequiredAuthPath(String[] patterns){
@@ -121,6 +115,7 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
+
 //
 //    @Bean
 //    public HttpSessionEventPublisher httpSessionEventPublisher() {

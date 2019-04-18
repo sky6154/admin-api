@@ -21,24 +21,28 @@ import java.util.Map;
 
 @Service
 public class TokenService<S extends Session> {
-    @Autowired
-    private FindByIndexNameSessionRepository sessionRepository;
+    private final FindByIndexNameSessionRepository sessionRepository;
+    private final AuthenticationManager authenticationManager;
+    private final UserService userService;
 
     @Autowired
-    private AuthenticationManager authenticationManager;
+    public TokenService(FindByIndexNameSessionRepository sessionRepository,
+                        AuthenticationManager authenticationManager,
+                        UserService userService) {
+        this.sessionRepository = sessionRepository;
+        this.authenticationManager = authenticationManager;
+        this.userService = userService;
+    }
 
-    @Autowired
-    private UserService userService;
-
-    public Map<String, ? extends Session> getSessionByName(String name){
+    public Map<String, ? extends Session> getSessionByName(String name) {
         return sessionRepository.findByPrincipalName(name);
     }
 
-    public void updateAccessTime(S session){
+    public void updateAccessTime(S session) {
         sessionRepository.save(session);
     }
 
-    public AuthenticationToken login(AuthenticationRequest authenticationRequest, HttpSession session){
+    public AuthenticationToken login(AuthenticationRequest authenticationRequest, HttpSession session) {
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword());
         Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
 
@@ -65,33 +69,30 @@ public class TokenService<S extends Session> {
         return new AuthenticationToken(authentication.getName(), authentication.getAuthorities(), token);
     }
 
-    public boolean logout(String token){
+    public boolean logout(String token) {
         String decodedString = DevelobeerAuthenticationToken.decode(token);
         String[] info = DevelobeerAuthenticationToken.splitToken(decodedString);
 
-        if(info.length < 1){
+        if (info.length < 1) {
             throw new AuthenticationCredentialsNotFoundException("Token is not found.");
-        }
-        else{
+        } else {
             String userName = info[0];
             String sessionId = info[1];
 
             Map<String, ? extends Session> result = this.getSessionByName(userName);
 
-            if(result.size() < 1){
+            if (result.size() < 1) {
                 throw new AuthenticationCredentialsNotFoundException("Token is not found.");
-            }
-            else{
+            } else {
                 Session session = result.get(sessionId);
 
-                if(session == null){
+                if (session == null) {
                     throw new CredentialsExpiredException("Token is not valid.");
                 }
 
-                if(session.isExpired()){
+                if (session.isExpired()) {
                     throw new CredentialsExpiredException("Token is expired.");
-                }
-                else{
+                } else {
                     Map<String, ? extends Session> sessions = this.getSessionByName(userName);
 
                     // 기존 로그인된 세션을 모두 지운다.
@@ -107,41 +108,38 @@ public class TokenService<S extends Session> {
 
 
     public Collection<? extends GrantedAuthority> authCheck(String token) {
-        if(token == null) {
+        if (token == null) {
             return null;
         }
 
         String decodedString = DevelobeerAuthenticationToken.decode(token);
 
-        if(decodedString == null){
+        if (decodedString == null) {
             throw new AuthenticationServiceException("Invalid token");
         }
 
         String[] info = DevelobeerAuthenticationToken.splitToken(decodedString);
 
-        if(info.length < 1){
+        if (info.length < 1) {
             throw new AuthenticationCredentialsNotFoundException("Token is not found.");
-        }
-        else{
+        } else {
             String userName = info[0];
             String sessionId = info[1];
 
             Map<String, ? extends Session> result = this.getSessionByName(userName);
 
-            if(result.size() < 1){
+            if (result.size() < 1) {
                 throw new AuthenticationCredentialsNotFoundException("Token is not found.");
-            }
-            else{
+            } else {
                 Session session = result.get(sessionId);
 
-                if(session == null){
+                if (session == null) {
                     throw new CredentialsExpiredException("Token is invalid.");
                 }
 
-                if(session.isExpired()){
+                if (session.isExpired()) {
                     throw new CredentialsExpiredException("Token is expired.");
-                }
-                else{
+                } else {
                     session.setLastAccessedTime(new Date().toInstant());
                     this.updateAccessTime((S) session);
 

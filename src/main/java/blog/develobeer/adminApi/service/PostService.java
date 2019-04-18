@@ -19,8 +19,12 @@ import java.util.List;
 @Service
 public class PostService {
 
+    private final BlogPostRepository blogPostRepository;
+
     @Autowired
-    private BlogPostRepository blogPostRepository;
+    public PostService(BlogPostRepository blogPostRepository){
+        this.blogPostRepository = blogPostRepository;
+    }
 
     private static String UPLOAD_ROOT;
     private static String ACCESS_ADDR;

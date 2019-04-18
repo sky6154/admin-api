@@ -28,13 +28,11 @@ public class CustomTokenAuthenticationFilter extends AbstractAuthenticationProce
     private static final Logger logger = LoggerFactory.getLogger(CustomTokenAuthenticationFilter.class);
     public final String HEADER_SECURITY_TOKEN = "X-Develobeer-Token";
 
-    @Autowired
     private TokenService tokenService;
-
-    @Autowired
     private UserService userService;
 
-    public CustomTokenAuthenticationFilter(RequestMatcher requestMatcher, AuthenticationManager authenticationManager) {
+    public CustomTokenAuthenticationFilter(RequestMatcher requestMatcher,
+                                           AuthenticationManager authenticationManager) {
         super(requestMatcher);
         setAuthenticationManager(authenticationManager);
         setAuthenticationSuccessHandler(new TokenSimpleUrlAuthenticationSuccessHandler());
@@ -46,7 +44,7 @@ public class CustomTokenAuthenticationFilter extends AbstractAuthenticationProce
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
         // chrome preflight options인 경우 pass 한다.
-        if(request.getMethod().equals("OPTIONS")){
+        if (request.getMethod().equals("OPTIONS")) {
             response.setStatus(HttpServletResponse.SC_OK);
             return null;
         }
@@ -55,7 +53,7 @@ public class CustomTokenAuthenticationFilter extends AbstractAuthenticationProce
 
         AbstractAuthenticationToken userAuthenticationToken = authUserByToken(token);
 
-        if(userAuthenticationToken == null){
+        if (userAuthenticationToken == null) {
             throw new AuthenticationServiceException(MessageFormat.format("Error | {0}", "Bad Token"));
         }
         return userAuthenticationToken;
@@ -64,44 +62,42 @@ public class CustomTokenAuthenticationFilter extends AbstractAuthenticationProce
 
     /**
      * authenticate the user based on token
+     *
      * @return
      */
     private AbstractAuthenticationToken authUserByToken(String token) {
-        if(token == null) {
+        if (token == null) {
             return null;
         }
 
         String decodedString = DevelobeerAuthenticationToken.decode(token);
 
-        if(decodedString == null){
+        if (decodedString == null) {
             throw new AuthenticationServiceException("Invalid token");
         }
 
         String[] info = DevelobeerAuthenticationToken.splitToken(decodedString);
 
-        if(info.length < 1){
+        if (info.length < 1) {
             throw new AuthenticationCredentialsNotFoundException("Token is not found.");
-        }
-        else{
+        } else {
             String userName = info[0];
             String sessionId = info[1];
 
             Map<String, ? extends Session> result = tokenService.getSessionByName(userName);
 
-            if(result.size() < 1){
+            if (result.size() < 1) {
                 throw new AuthenticationCredentialsNotFoundException("Token is not found.");
-            }
-            else{
+            } else {
                 Session session = result.get(sessionId);
 
-                if(session == null){
+                if (session == null) {
                     throw new CredentialsExpiredException("Token is invalid.");
                 }
 
-                if(session.isExpired()){
+                if (session.isExpired()) {
                     throw new CredentialsExpiredException("Token is expired.");
-                }
-                else{
+                } else {
                     session.setLastAccessedTime(new Date().toInstant());
                     tokenService.updateAccessTime(session);
 
@@ -124,13 +120,13 @@ public class CustomTokenAuthenticationFilter extends AbstractAuthenticationProce
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
-        if(tokenService==null){
+        if (tokenService == null) {
             ServletContext servletContext = req.getServletContext();
             WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
             tokenService = webApplicationContext.getBean(TokenService.class);
         }
 
-        if(userService==null){
+        if (userService == null) {
             ServletContext servletContext = req.getServletContext();
             WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
             userService = webApplicationContext.getBean(UserService.class);

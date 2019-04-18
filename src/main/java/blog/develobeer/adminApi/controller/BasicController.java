@@ -7,27 +7,23 @@ import blog.develobeer.adminApi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 
 @RestController
 @RequestMapping("/")
 public class BasicController {
 
-    @Autowired
-    UserService userService;
+    private final TokenService tokenService;
 
     @Autowired
-    TokenService tokenService;
-
-    @Autowired
-    AuthenticationManager authenticationManager;
+    public BasicController(TokenService tokenService){
+        this.tokenService = tokenService;
+    }
 
     @GetMapping("/")
     public String home() {

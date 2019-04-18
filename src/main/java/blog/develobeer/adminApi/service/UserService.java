@@ -20,11 +20,16 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserService implements UserDetailsService {
-    @Autowired
-    private UserRepository userRepository;
+
+    private final UserRepository userRepository;
+    private final UserRoleRepository userRoleRepository;
 
     @Autowired
-    private UserRoleRepository userRoleRepository;
+    public UserService(UserRepository userRepository,
+                       UserRoleRepository userRoleRepository) {
+        this.userRepository = userRepository;
+        this.userRoleRepository = userRoleRepository;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -36,7 +41,7 @@ public class UserService implements UserDetailsService {
                 .map(user -> new UserDetails() {
                     @Override
                     public Collection<? extends GrantedAuthority> getAuthorities() {
-                        List<UserRole> userRoles = userRoleRepository.getUserRolesByUserId( user.getId() ).orElse( Collections.emptyList() );
+                        List<UserRole> userRoles = userRoleRepository.getUserRolesByUserId(user.getId()).orElse(Collections.emptyList());
 
                         return userRoles
                                 .stream()
