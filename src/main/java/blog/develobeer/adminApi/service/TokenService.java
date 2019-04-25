@@ -23,15 +23,15 @@ import java.util.Map;
 public class TokenService<S extends Session> {
     private final FindByIndexNameSessionRepository sessionRepository;
     private final AuthenticationManager authenticationManager;
-    private final UserService userService;
+    private final AdminService adminService;
 
     @Autowired
     public TokenService(FindByIndexNameSessionRepository sessionRepository,
                         AuthenticationManager authenticationManager,
-                        UserService userService) {
+                        AdminService adminService) {
         this.sessionRepository = sessionRepository;
         this.authenticationManager = authenticationManager;
-        this.userService = userService;
+        this.adminService = adminService;
     }
 
     public Map<String, ? extends Session> getSessionByName(String name) {
@@ -143,7 +143,7 @@ public class TokenService<S extends Session> {
                     session.setLastAccessedTime(new Date().toInstant());
                     this.updateAccessTime((S) session);
 
-                    UserDetails userDetails = userService.loadUserByUsername(userName);
+                    UserDetails userDetails = adminService.loadUserByUsername(userName);
 
                     try {
                         return userDetails.getAuthorities();

@@ -10,7 +10,7 @@ import java.io.Serializable;
 @Setter
 @Getter
 @Embeddable
-public class UserRoleId implements Serializable {
+public class AdminRoleId implements Serializable {
     @Column(name="user_seq")
     private Integer userSeq;
 

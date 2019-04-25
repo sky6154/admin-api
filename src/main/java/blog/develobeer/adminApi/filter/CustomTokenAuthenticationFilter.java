@@ -1,10 +1,9 @@
 package blog.develobeer.adminApi.filter;
 
 import blog.develobeer.adminApi.service.TokenService;
-import blog.develobeer.adminApi.service.UserService;
+import blog.develobeer.adminApi.service.AdminService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -29,7 +28,7 @@ public class CustomTokenAuthenticationFilter extends AbstractAuthenticationProce
     public final String HEADER_SECURITY_TOKEN = "X-Develobeer-Token";
 
     private TokenService tokenService;
-    private UserService userService;
+    private AdminService adminService;
 
     public CustomTokenAuthenticationFilter(RequestMatcher requestMatcher,
                                            AuthenticationManager authenticationManager) {
@@ -101,7 +100,7 @@ public class CustomTokenAuthenticationFilter extends AbstractAuthenticationProce
                     session.setLastAccessedTime(new Date().toInstant());
                     tokenService.updateAccessTime(session);
 
-                    UserDetails userDetails = userService.loadUserByUsername(userName);
+                    UserDetails userDetails = adminService.loadUserByUsername(userName);
 
                     DevelobeerAuthenticationToken auth = new DevelobeerAuthenticationToken(userDetails);
 
@@ -126,10 +125,10 @@ public class CustomTokenAuthenticationFilter extends AbstractAuthenticationProce
             tokenService = webApplicationContext.getBean(TokenService.class);
         }
 
-        if (userService == null) {
+        if (adminService == null) {
             ServletContext servletContext = req.getServletContext();
             WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
-            userService = webApplicationContext.getBean(UserService.class);
+            adminService = webApplicationContext.getBean(AdminService.class);
         }
 
         super.doFilter(req, res, chain);

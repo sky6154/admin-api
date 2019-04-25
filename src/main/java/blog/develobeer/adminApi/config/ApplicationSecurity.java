@@ -3,8 +3,7 @@ package blog.develobeer.adminApi.config;
 import blog.develobeer.adminApi.filter.CustomTokenAuthenticationFilter;
 import blog.develobeer.adminApi.filter.MyLogoutSuccessHandler;
 import blog.develobeer.adminApi.filter.RestAuthenticationEntryPoint;
-import blog.develobeer.adminApi.service.TokenService;
-import blog.develobeer.adminApi.service.UserService;
+import blog.develobeer.adminApi.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +14,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -32,17 +30,20 @@ import java.util.List;
 @EnableWebSecurity
 public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
 
-    private final UserService userService;
+    private final AdminService adminService;
     private final FindByIndexNameSessionRepository<? extends Session> sessionRepository;
     private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public ApplicationSecurity(UserService userService,
+    public ApplicationSecurity(AdminService adminService,
                                FindByIndexNameSessionRepository<? extends Session> sessionRepository,
-                               RestAuthenticationEntryPoint restAuthenticationEntryPoint){
-        this.userService = userService;
+                               RestAuthenticationEntryPoint restAuthenticationEntryPoint,
+                               PasswordEncoder passwordEncoder){
+        this.adminService = adminService;
         this.sessionRepository = sessionRepository;
         this.restAuthenticationEntryPoint = restAuthenticationEntryPoint;
+        this.passwordEncoder = passwordEncoder;
     }
 
     private String[] AUTHENTICATION_REQUIRED_PATTERN = {"/admin/**", "/post/**", "/board/**"};
@@ -62,7 +63,7 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
                     .and()
                 .addFilterBefore(customTokenAuthenticationFilter(AUTHENTICATION_REQUIRED_PATTERN), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                    .antMatchers("/", "/login", "/logout", "/error", "/authCheck").permitAll()
+                    .antMatchers("/", "/login", "/logout", "/error").permitAll()
                     .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                     .antMatchers(AUTHENTICATION_REQUIRED_PATTERN).hasAnyAuthority("ROLE_ADMIN")
                     .anyRequest().authenticated()
@@ -102,12 +103,7 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userService).passwordEncoder(getPasswordEncoder());
-    }
-
-    @Bean
-    public PasswordEncoder getPasswordEncoder(){
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+        auth.userDetailsService(adminService).passwordEncoder(passwordEncoder);
     }
 
     @Bean

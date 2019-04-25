@@ -15,9 +15,9 @@ import java.sql.Timestamp;
 @Getter
 @Entity
 @Table(name="user_role")
-public class UserRole implements Serializable {
+public class AdminRole implements Serializable {
     @EmbeddedId
-    private UserRoleId userRoleId;
+    private AdminRoleId adminRoleId;
 
     private String id;
 
