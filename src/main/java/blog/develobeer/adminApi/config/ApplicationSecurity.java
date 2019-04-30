@@ -39,41 +39,44 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
     public ApplicationSecurity(AdminService adminService,
                                FindByIndexNameSessionRepository<? extends Session> sessionRepository,
                                RestAuthenticationEntryPoint restAuthenticationEntryPoint,
-                               PasswordEncoder passwordEncoder){
+                               PasswordEncoder passwordEncoder) {
         this.adminService = adminService;
         this.sessionRepository = sessionRepository;
         this.restAuthenticationEntryPoint = restAuthenticationEntryPoint;
         this.passwordEncoder = passwordEncoder;
     }
 
-    private String[] AUTHENTICATION_REQUIRED_PATTERN = {"/admin/**", "/post/**", "/board/**"};
+    private String[] AUTHENTICATION_REQUIRED_PATTERN = {"/admin/**", "/post/**", "/board/**", "/authCheck"};
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf()
-                    .disable()
+                .disable()
                 .httpBasic().disable()
                 .sessionManagement()
-                    .maximumSessions(1)
-                    .sessionRegistry(sessionRegistry())
-                    .maxSessionsPreventsLogin(true)
-                    .and()
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                    .and()
+                .maximumSessions(1)
+                .sessionRegistry(sessionRegistry())
+                .maxSessionsPreventsLogin(true)
+                .and()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
                 .addFilterBefore(customTokenAuthenticationFilter(AUTHENTICATION_REQUIRED_PATTERN), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                    .antMatchers("/", "/login", "/logout", "/error").permitAll()
-                    .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                    .antMatchers(AUTHENTICATION_REQUIRED_PATTERN).hasAnyAuthority("ROLE_ADMIN")
-                    .anyRequest().authenticated()
-                    .and()
+                .antMatchers("/", "/login", "/logout", "/error").permitAll()
+                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .antMatchers("/authCheck").hasAnyAuthority("ROLE_BLOG", "ROLE_ADMIN", "ROLE_ETC")
+                .antMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
+                .antMatchers("/post/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_BLOG")
+                .antMatchers("/board/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_BLOG")
+                .anyRequest().authenticated()
+                .and()
                 .exceptionHandling()
                 .authenticationEntryPoint(restAuthenticationEntryPoint)
                 .and()
                 .logout()
-                    .logoutUrl("/logout")
-                    .logoutSuccessHandler(new MyLogoutSuccessHandler());
+                .logoutUrl("/logout")
+                .logoutSuccessHandler(new MyLogoutSuccessHandler());
 //                  .invalidateHttpSession(true);
 
     }
@@ -82,10 +85,10 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
         return new CustomTokenAuthenticationFilter(getRequiredAuthPath(patterns), this.authenticationManagerBean());
     }
 
-    public OrRequestMatcher getRequiredAuthPath(String[] patterns){
+    public OrRequestMatcher getRequiredAuthPath(String[] patterns) {
         List<RequestMatcher> requestMatchers = new ArrayList<>();
 
-        for(String pattern : patterns) {
+        for (String pattern : patterns) {
             RequestMatcher requestMatcher = new AntPathRequestMatcher(pattern);
 
             requestMatchers.add(requestMatcher);
