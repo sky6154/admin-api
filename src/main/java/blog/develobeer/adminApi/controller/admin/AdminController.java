@@ -1,9 +1,9 @@
 package blog.develobeer.adminApi.controller.admin;
 
 import blog.develobeer.adminApi.config.GsonDateDeserializer;
-import blog.develobeer.adminApi.domain.admin.role.Role;
 import blog.develobeer.adminApi.domain.admin.role.AdminRole;
 import blog.develobeer.adminApi.domain.admin.role.AdminRoleId;
+import blog.develobeer.adminApi.domain.admin.role.Role;
 import blog.develobeer.adminApi.domain.admin.user.Admin;
 import blog.develobeer.adminApi.service.AdminService;
 import com.google.gson.Gson;
@@ -11,9 +11,14 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletResponse;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -27,7 +32,7 @@ public class AdminController {
     private final Gson gson;
 
     @Autowired
-    public AdminController(AdminService adminService){
+    public AdminController(AdminService adminService) {
         this.adminService = adminService;
         this.gson = new GsonBuilder()
                 .serializeNulls() // null인 object의 내부 변수가 null이면 key를 없애지 않고 null로 명시한다.
@@ -37,33 +42,32 @@ public class AdminController {
     }
 
     @RequestMapping(value = "/")
-    public String home(){
-        return "HELLO ADMIN !";
+    public ResponseEntity<String> home() {
+        return ResponseEntity.ok("HELLO ADMIN !");
     }
 
     @RequestMapping(value = "/add", method = RequestMethod.POST, consumes = "application/json")
-    public boolean add(@RequestBody String json, HttpServletResponse res) {
+    public ResponseEntity add(@RequestBody String json, UriComponentsBuilder b) {
         JsonParser parser = new JsonParser();
         JsonObject jsonObject = parser.parse(json).getAsJsonObject();
 
         try {
-            JsonObject jAdminUser = jsonObject.getAsJsonObject("adminAdmin");
-            Admin adminAdmin = gson.fromJson(jAdminUser, Admin.class);
-            adminAdmin.setPwd("1234"); // default password
+            JsonObject jAdminUser = jsonObject.getAsJsonObject("admin");
+            Admin admin = gson.fromJson(jAdminUser, Admin.class);
+            admin.setPwd("1234"); // default password
 
-            if(adminService.isExist(adminAdmin.getId())){
-                res.sendError(HttpServletResponse.SC_CONFLICT, "Admin already exist");
-                return false;
+            if (adminService.isExist(admin.getId())) {
+                return new ResponseEntity<>("Admin already exist", HttpStatus.CONFLICT);
             }
 
-            Admin result = adminService.addAdmin(adminAdmin);
+            Admin result = adminService.addAdmin(admin);
 
-            if(result != null){
-                Iterator roleList = jsonObject.getAsJsonArray("role").iterator();
+            if (result != null) {
+                Iterator<com.google.gson.JsonElement> roleList = jsonObject.getAsJsonArray("role").iterator();
 
                 List<AdminRole> adminRoleList = new ArrayList<>();
 
-                while(roleList.hasNext()){
+                while (roleList.hasNext()) {
                     String val = roleList.next().toString();
 
                     Role role = gson.fromJson(val, Role.class);
@@ -80,21 +84,21 @@ public class AdminController {
 
                 adminService.addAdminRole(adminRoleList);
 
-                return true;
+                UriComponents uriComponents = b.path("/add/{id}").buildAndExpand(admin.getId());
+
+                return ResponseEntity.created(uriComponents.toUri()).build();
+            } else {
+                return new ResponseEntity<>("Admin add fail.", HttpStatus.INTERNAL_SERVER_ERROR);
             }
-            else{
-                return false;
-            }
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return false;
+        return ResponseEntity.badRequest().build();
     }
 
-    @RequestMapping(value = "/getAllAdmin", method = RequestMethod.GET)
-    public String getAllAdmin(){
-        return gson.toJson(adminService.getAllAdmin());
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    public Iterable<Admin> getAllAdminList() {
+        return adminService.getAllAdminList();
     }
 }

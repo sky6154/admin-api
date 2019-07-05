@@ -21,13 +21,13 @@ public class PostService {
 
     private final BlogPostRepository blogPostRepository;
 
+    private static String UPLOAD_ROOT;
+    private static String ACCESS_ADDR;
+
     @Autowired
     public PostService(BlogPostRepository blogPostRepository){
         this.blogPostRepository = blogPostRepository;
     }
-
-    private static String UPLOAD_ROOT;
-    private static String ACCESS_ADDR;
 
     @Autowired
     public void setUploadRoot(@Value("${path.upload-root}") String uploadRoot){
@@ -49,7 +49,7 @@ public class PostService {
      * @param files
      * @return
      */
-    public List<CustomResult> fileUpload(MultipartFile[] files){
+    public List<CustomResult> uploadFile(MultipartFile[] files){
         ArrayList<CustomResult> result = new ArrayList<>();
 
         if (files == null || files.length < 1) {

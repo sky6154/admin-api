@@ -102,7 +102,7 @@ public class AdminService implements UserDetailsService {
         return CommonTemplateMethod.simpleSaveTryCatchBooleanReturn(adminRoleRepository, adminRoleList);
     }
 
-    public List<Admin> getAllAdmin(){
+    public List<Admin> getAllAdminList(){
         List<Admin> adminList = adminRepository.findAll();
 
         for(Integer i = 0; i < adminList.size(); i++){

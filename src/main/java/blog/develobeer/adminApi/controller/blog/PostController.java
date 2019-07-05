@@ -4,12 +4,7 @@ import blog.develobeer.adminApi.domain.common.CustomResult;
 import blog.develobeer.adminApi.service.PostService;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.parameters.P;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.lang.reflect.Type;
@@ -26,13 +21,13 @@ public class PostController {
         this.postService = postService;
     }
 
-    @RequestMapping(value = "/fileUpload", method = RequestMethod.POST)
-    public List<CustomResult> upload(MultipartFile[] files) {
-        return postService.fileUpload(files);
+    @RequestMapping(value = "/uploadFile", method = RequestMethod.POST)
+    public List<CustomResult> uploadFile(MultipartFile[] files) {
+        return postService.uploadFile(files);
     }
 
-    @RequestMapping(value = "/uploadPost", method = RequestMethod.POST)
-    public CustomResult uploadPost(@RequestBody String jsonData) {
+    @RequestMapping(value = "/{boardId}", method = RequestMethod.POST)
+    public CustomResult uploadPost(@RequestBody String jsonData, @PathVariable String boardId) {
         Gson gson = new Gson();
 
         Type type = new TypeToken<Map<String, String>>(){}.getType();

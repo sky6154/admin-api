@@ -31,17 +31,17 @@ import java.util.List;
 public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
 
     private final AdminService adminService;
-    private final FindByIndexNameSessionRepository<? extends Session> sessionRepository;
+//    private final FindByIndexNameSessionRepository<? extends Session> sessionRepository;
     private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public ApplicationSecurity(AdminService adminService,
-                               FindByIndexNameSessionRepository<? extends Session> sessionRepository,
+//                               FindByIndexNameSessionRepository<? extends Session> sessionRepository,
                                RestAuthenticationEntryPoint restAuthenticationEntryPoint,
                                PasswordEncoder passwordEncoder) {
         this.adminService = adminService;
-        this.sessionRepository = sessionRepository;
+//        this.sessionRepository = sessionRepository;
         this.restAuthenticationEntryPoint = restAuthenticationEntryPoint;
         this.passwordEncoder = passwordEncoder;
     }
@@ -55,10 +55,10 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
                 .disable()
                 .httpBasic().disable()
                 .sessionManagement()
-                .maximumSessions(1)
-                .sessionRegistry(sessionRegistry())
-                .maxSessionsPreventsLogin(true)
-                .and()
+//                .maximumSessions(1)
+//                .sessionRegistry(sessionRegistry())
+//                .maxSessionsPreventsLogin(true)
+//                .and()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .addFilterBefore(customTokenAuthenticationFilter(AUTHENTICATION_REQUIRED_PATTERN), UsernamePasswordAuthenticationFilter.class)
@@ -99,10 +99,10 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
         return orRequestMatcher;
     }
 
-    @Bean
-    public SpringSessionBackedSessionRegistry sessionRegistry() {
-        return new SpringSessionBackedSessionRegistry(this.sessionRepository);
-    }
+//    @Bean
+//    public SpringSessionBackedSessionRegistry sessionRegistry() {
+//        return new SpringSessionBackedSessionRegistry(this.sessionRepository);
+//    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {

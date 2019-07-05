@@ -50,6 +50,11 @@ public class CustomTokenAuthenticationFilter extends AbstractAuthenticationProce
 
         String token = request.getHeader(HEADER_SECURITY_TOKEN);
 
+        // TODO
+        // 여기서 string null, undefined를 처리할지, FE단에서 처리해서 보낸다고 할지 고민...
+//        System.out.println("#########");
+//        System.out.println(token);
+
         AbstractAuthenticationToken userAuthenticationToken = authUserByToken(token);
 
         if (userAuthenticationToken == null) {

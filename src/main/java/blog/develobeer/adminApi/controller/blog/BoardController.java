@@ -20,7 +20,7 @@ public class BoardController {
         this.boardService = boardService;
     }
 
-    @RequestMapping(value = "/getBoardList", method = RequestMethod.GET)
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
     public List<BlogBoard> getBoardList() {
         return boardService.getBoardList();
     }

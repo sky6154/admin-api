@@ -72,18 +72,20 @@ public class TokenManager {
     }
 
     public static String decrypt(String encryptedText){
-        try {
-            Cipher cipher = Cipher.getInstance("RSA");
-            cipher.init(Cipher.DECRYPT_MODE, privateKey);
+        if(encryptedText != null){
+            try {
+                Cipher cipher = Cipher.getInstance("RSA");
+                cipher.init(Cipher.DECRYPT_MODE, privateKey);
 
-            byte[] byteEncrypted = Base64.getDecoder().decode(encryptedText.getBytes(StandardCharsets.UTF_8));
-            byte[] bytePlain = cipher.doFinal(byteEncrypted);
-            String decrypted = new String(bytePlain, "utf-8");
+                byte[] byteEncrypted = Base64.getDecoder().decode(encryptedText.getBytes(StandardCharsets.UTF_8));
+                byte[] bytePlain = cipher.doFinal(byteEncrypted);
+                String decrypted = new String(bytePlain, "utf-8");
 
-            return decrypted;
-        }
-        catch(Exception e){
-            e.printStackTrace();
+                return decrypted;
+            }
+            catch(Exception e){
+                e.printStackTrace();
+            }
         }
 
         return null;
