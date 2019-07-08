@@ -46,11 +46,7 @@ public class TokenService<S extends Session> {
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword());
         Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
 
-//        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
-        context.setAuthentication(authentication);
-        SecurityContextHolder.setContext(context);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         Map<String, ? extends Session> sessions = this.getSessionByName(authentication.getName());
 
@@ -60,11 +56,7 @@ public class TokenService<S extends Session> {
         });
 
         session.setAttribute(FindByIndexNameSessionRepository.PRINCIPAL_NAME_INDEX_NAME, authentication.getName());
-
         String token = DevelobeerAuthenticationToken.encode(authentication.getName(), session.getId());
-
-//        SecurityContextHolder.getContext().setAuthentication(authentication);
-//        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
 
         return new AuthenticationToken(authentication.getName(), authentication.getAuthorities(), token);
     }

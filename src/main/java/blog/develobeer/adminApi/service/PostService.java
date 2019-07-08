@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,6 +16,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class PostService {
@@ -25,83 +27,65 @@ public class PostService {
     private static String ACCESS_ADDR;
 
     @Autowired
-    public PostService(BlogPostRepository blogPostRepository){
+    public PostService(BlogPostRepository blogPostRepository) {
         this.blogPostRepository = blogPostRepository;
     }
 
     @Autowired
-    public void setUploadRoot(@Value("${path.upload-root}") String uploadRoot){
+    public void setUploadRoot(@Value("${path.upload-root}") String uploadRoot) {
         this.UPLOAD_ROOT = uploadRoot;
     }
 
     @Autowired
-    public void setAccessAddr(@Value("${path.access-addr}") String accessAddr){
+    public void setAccessAddr(@Value("${path.access-addr}") String accessAddr) {
         this.ACCESS_ADDR = accessAddr;
     }
 
 
     /**
      * 이미지 업로드
-     *  1 : 성공
+     * 1 : 성공
      * -1 : 파일 없음
      * -2 : 폴더 생성 실패
      * -3 : 파일 업로드 실패
-     * @param files
+     *
+     * @param file
      * @return
      */
-    public List<CustomResult> uploadFile(MultipartFile[] files){
-        ArrayList<CustomResult> result = new ArrayList<>();
+    public Map<String, String> uploadFile(MultipartFile file) throws IOException {
+        Map<String, String> result = new HashMap<>();
 
-        if (files == null || files.length < 1) {
-            result.add(new CustomResult(-1, "File doesn't exist !!"));
+        if (file == null) {
+            throw new IOException("File not exist.");
         } else {
             // 경로(폴더)가 없을 경우 생성
             if (Files.notExists(Paths.get(UPLOAD_ROOT))) {
-                try {
-                    Files.createDirectory(Paths.get(UPLOAD_ROOT));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    result.add(new CustomResult(-2, "Fail to create destination folder."));
-                }
+                Files.createDirectory(Paths.get(UPLOAD_ROOT));
             }
 
-            // 파일 저장
-            for(MultipartFile multipartFile : files){
-                try {
-                    byte[] bytes = multipartFile.getBytes();
+            byte[] bytes = file.getBytes();
 
-                    Path path = Paths.get(UPLOAD_ROOT + multipartFile.getOriginalFilename());
-                    Files.write(path, bytes);
+            Path path = Paths.get(UPLOAD_ROOT + file.getOriginalFilename());
+            Files.write(path, bytes);
 
-                    CustomResult customResult = new CustomResult(1, "File is uploaded successfully : " + multipartFile.getOriginalFilename());
-                    HashMap<String, String> map = new HashMap<>();
+            result.put("fileName", file.getOriginalFilename());
+            result.put("path", ACCESS_ADDR);
 
-                    map.put("fileName", multipartFile.getOriginalFilename());
-                    map.put("path", ACCESS_ADDR);
-
-                    customResult.setAdditional(map);
-
-                    result.add(customResult);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    result.add(new CustomResult(-3, "Fail to upload : " + multipartFile.getOriginalFilename()));
-                }
-            }
+            return result;
         }
-
-        return result;
     }
 
     /**
      * 글쓰기
-     *  1 : 성공
+     * 1 : 성공
      * -1 : DB insert 실패
+     *
      * @param boardId
      * @param title
      * @param content
      * @return
      */
-    public CustomResult uploadPost(Integer boardId, String title, String content){
+    public boolean uploadPost(Integer boardId, String title, String content) {
         BlogPost blogPost = new BlogPost();
 
         blogPost.setBoardId(boardId);
@@ -109,18 +93,12 @@ public class PostService {
         blogPost.setContent(content);
         blogPost.setAuthor("kokj");
 
-        CustomResult customResult;
-
-        try{
+        try {
             blogPostRepository.saveAndFlush(blogPost);
-
-            customResult = new CustomResult(1, "Upload success");
-        }
-        catch(Exception e){
+            return true;
+        } catch (Exception e) {
             e.printStackTrace();
-            customResult = new CustomResult(-1, e.getMessage());
+            return false;
         }
-
-        return customResult;
     }
 }
