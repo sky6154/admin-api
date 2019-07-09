@@ -1,7 +1,5 @@
 package blog.develobeer.adminApi.controller.blog;
 
-import blog.develobeer.adminApi.domain.common.CustomResult;
-import blog.develobeer.adminApi.domain.common.error_code.ResponseErrorCode;
 import blog.develobeer.adminApi.service.PostService;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -26,30 +24,28 @@ public class PostController {
         this.postService = postService;
     }
 
-    @RequestMapping(value = "/uploadFile", method = RequestMethod.POST)
-    public ResponseEntity uploadFile(MultipartFile[] files) {
+    @RequestMapping(value = "/uploadFile/{boardId}", method = RequestMethod.POST)
+    public ResponseEntity uploadFile(MultipartFile[] files, @PathVariable Integer boardId) {
         List<Map<String, String>> result = new ArrayList<>();
 
         if(files == null || files.length < 1){
             return ResponseEntity.badRequest().build();
         }
 
-        for(MultipartFile file : files){
+        for(int index = 0; index < files.length; index++){
             try {
-                result.add(postService.uploadFile(file));
+                result.add(postService.uploadFile(boardId, index, files[index]));
             } catch (IOException e) {
                 e.printStackTrace();
-                return new ResponseEntity<>(file.getOriginalFilename(), HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<>(files[index].getOriginalFilename(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
 
         return ResponseEntity.ok(result);
-
-//        return ResponseEntity.created().build();
     }
 
     @RequestMapping(value = "/{boardId}", method = RequestMethod.POST)
-    public ResponseEntity uploadPost(@RequestBody String jsonData, @PathVariable String boardId) {
+    public ResponseEntity uploadPost(@RequestBody String jsonData, @PathVariable Integer boardId) {
         Gson gson = new Gson();
 
         Type type = new TypeToken<Map<String, String>>(){}.getType();
