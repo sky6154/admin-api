@@ -35,7 +35,7 @@ public class PostController {
         for(int index = 0; index < files.length; index++){
             try {
                 result.add(postService.uploadFile(boardId, index, files[index]));
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 return new ResponseEntity<>(files[index].getOriginalFilename(), HttpStatus.INTERNAL_SERVER_ERROR);
             }

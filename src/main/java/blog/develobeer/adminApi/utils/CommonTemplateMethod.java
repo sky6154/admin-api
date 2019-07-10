@@ -7,7 +7,7 @@ import java.util.List;
 public class CommonTemplateMethod {
     public static <T, ID> boolean simpleSaveTryCatchBooleanReturn(JpaRepository<T, ID> repo, T model){
         try{
-            repo.save(model);
+            repo.saveAndFlush(model);
             return true;
         }
         catch(Exception e){

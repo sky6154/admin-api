@@ -2,6 +2,8 @@ package blog.develobeer.adminApi.service;
 
 import blog.develobeer.adminApi.dao.blog.BlogPostRepository;
 import blog.develobeer.adminApi.domain.blog.BlogPost;
+import blog.develobeer.adminApi.utils.CommonTemplateMethod;
+import blog.develobeer.adminApi.utils.SimpleAES256;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,6 +15,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.Principal;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,7 +28,11 @@ public class PostService {
     private static String UPLOAD_ROOT;
     private static String ACCESS_ADDR;
 
+    private static int ITERATION_COUNT;
+    private static String KEY;
+
     private static final String BOARD_FOLDER = "board/";
+    private static final String FILE_SEPARATOR = "_";
 
     @Autowired
     public PostService(BlogPostRepository blogPostRepository) {
@@ -41,8 +49,18 @@ public class PostService {
         this.ACCESS_ADDR = accessAddr;
     }
 
+    @Autowired
+    public void setIterationCount(@Value("${secure.image.iteration-count}") int iterationCount) {
+        this.ITERATION_COUNT = iterationCount;
+    }
 
-    public Map<String, String> uploadFile(Integer boardId, int index, MultipartFile file) throws IOException {
+    @Autowired
+    public void setKey(@Value("${secure.image.key}") String key) {
+        this.KEY = key;
+    }
+
+
+    public Map<String, String> uploadFile(Integer boardId, int index, MultipartFile file) throws IOException, Exception {
         Map<String, String> result = new HashMap<>();
 
         if (file == null) {
@@ -58,28 +76,29 @@ public class PostService {
             int counter = 2;
             int dot = file.getOriginalFilename().lastIndexOf('.');
 
+            Timestamp now = new Timestamp(System.currentTimeMillis());
+            Principal principal = (Principal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
             String fileName = file.getOriginalFilename();
             String extension = "";
-            String orignalFileName = file.getOriginalFilename();
 
             if (dot > 0) {
                 fileName = file.getOriginalFilename().substring(0, dot);
                 extension = file.getOriginalFilename().substring(dot + 1);
-                orignalFileName = file.getOriginalFilename().substring(0, dot);
             }
 
-            // TODO
-            // 파일명 = 게시판 번호 + timestamp + 파일 index + 유저 ID ?? => hash.. 겹칠 가능성 ?
-            // 글번호는 글을 등록하고 알 수 있어서 이미지 업로드가 선행되어야 함..
+            boolean isBase32 = true;
+            String baseFileName = boardId + FILE_SEPARATOR + fileName + FILE_SEPARATOR + principal.getName() + FILE_SEPARATOR + now;
+            baseFileName = SimpleAES256.encryptAES256(baseFileName, KEY, ITERATION_COUNT, isBase32);
 
-            Path path = Paths.get(UPLOAD_ROOT + BOARD_FOLDER + file.getOriginalFilename());
+            Path path = Paths.get(UPLOAD_ROOT + BOARD_FOLDER + baseFileName + "." + extension);
 
             // 파일 이름이 겹칠 경우 괄호안에 카운팅을 하여 저장한다.
             while (Files.exists(path)) {
                 if (extension.equals("")) {
-                    fileName = orignalFileName + " (" + counter + ")";
+                    fileName = baseFileName + " (" + counter + ")";
                 } else {
-                    fileName = orignalFileName + " (" + counter + ")." + extension;
+                    fileName = baseFileName + " (" + counter + ")." + extension;
                 }
 
                 path = Paths.get(UPLOAD_ROOT + BOARD_FOLDER + fileName);
@@ -103,12 +122,6 @@ public class PostService {
         blogPost.setContent(content);
         blogPost.setAuthor("kokj");
 
-        try {
-            blogPostRepository.saveAndFlush(blogPost);
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+        return CommonTemplateMethod.simpleSaveTryCatchBooleanReturn(blogPostRepository, blogPost);
     }
 }

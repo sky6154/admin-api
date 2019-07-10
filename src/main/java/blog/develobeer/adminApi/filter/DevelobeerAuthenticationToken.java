@@ -20,7 +20,7 @@ public class DevelobeerAuthenticationToken extends AbstractAuthenticationToken {
         super.setAuthenticated(true); // must use super, as we override
 
         this.userDetails = userDetails;
-        this.principal = (Principal) () -> userDetails.getUsername();
+        this.principal = (Principal) userDetails::getUsername;
     }
 
     @Override
