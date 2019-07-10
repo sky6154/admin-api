@@ -44,6 +44,8 @@ dependencies {
 
     compile("org.springframework.session:spring-session-data-redis")
     compile("io.lettuce:lettuce-core")
+    
+    compile group: 'commons-codec', name: 'commons-codec', version: '1.5'
 }
 
 task wrapper(type: Wrapper) {
