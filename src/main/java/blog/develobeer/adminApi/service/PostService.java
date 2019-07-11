@@ -18,6 +18,7 @@ import java.nio.file.Paths;
 import java.security.Principal;
 import java.sql.Timestamp;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -123,5 +124,9 @@ public class PostService {
         blogPost.setAuthor("kokj");
 
         return CommonTemplateMethod.simpleSaveTryCatchBooleanReturn(blogPostRepository, blogPost);
+    }
+
+    public List<BlogPost> getPostList(int boardId){
+        return blogPostRepository.findAllByBoardIdOrderBySeqDesc(boardId);
     }
 }

@@ -3,6 +3,7 @@ package blog.develobeer.adminApi.controller.blog;
 import blog.develobeer.adminApi.service.PostService;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -56,6 +57,17 @@ public class PostController {
         }
         else{
             return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @RequestMapping(value = "/list/{boardId}", method = RequestMethod.GET)
+    public ResponseEntity getList(@PathVariable Integer boardId) {
+        try {
+            return ResponseEntity.ok(postService.getPostList(boardId));
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
