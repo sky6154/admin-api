@@ -92,7 +92,9 @@ public class PostService {
             String baseFileName = boardId + FILE_SEPARATOR + fileName + FILE_SEPARATOR + principal.getName() + FILE_SEPARATOR + now;
             baseFileName = SimpleAES256.encryptAES256(baseFileName, KEY, ITERATION_COUNT, isBase32);
 
-            Path path = Paths.get(UPLOAD_ROOT + BOARD_FOLDER + baseFileName + "." + extension);
+            fileName = baseFileName + "." + extension;
+
+            Path path = Paths.get(UPLOAD_ROOT + BOARD_FOLDER + fileName);
 
             // 파일 이름이 겹칠 경우 괄호안에 카운팅을 하여 저장한다.
             while (Files.exists(path)) {
