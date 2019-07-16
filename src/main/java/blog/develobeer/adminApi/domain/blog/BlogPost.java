@@ -41,6 +41,6 @@ public class BlogPost implements Serializable {
     private Timestamp modifyDate;
 
     @CreationTimestamp
-    @Column(name="reg_date")
+    @Column(name="reg_date", updatable = false)
     private Timestamp regDate;
 }

@@ -11,15 +11,18 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.NoResultException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class PostService {
@@ -126,6 +129,27 @@ public class PostService {
         blogPost.setAuthor("kokj");
 
         return CommonTemplateMethod.simpleSaveTryCatchBooleanReturn(blogPostRepository, blogPost);
+    }
+
+    public boolean updatePost(int boardId, int seq, String title, String content) {
+        Optional<BlogPost> blogPostOptional = blogPostRepository.findById(seq);
+
+        if(blogPostOptional.isPresent()){
+            BlogPost post = blogPostOptional.get();
+
+            post.setBoardId(boardId);
+            post.setTitle(title);
+            post.setContent(content);
+            post.setAuthor("kokj");
+            post.setModifyDate(Timestamp.valueOf(LocalDateTime.now()));
+
+            return CommonTemplateMethod.simpleSaveTryCatchBooleanReturn(blogPostRepository, post);
+        }
+        else{
+            throw new NoResultException("Post does not exist.");
+        }
+
+
     }
 
     public List<BlogPost> getPostList(int boardId){

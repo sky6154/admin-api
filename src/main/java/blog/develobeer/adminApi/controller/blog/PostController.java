@@ -45,14 +45,29 @@ public class PostController {
         return ResponseEntity.ok(result);
     }
 
-    @RequestMapping(value = "/{boardId}", method = RequestMethod.POST)
+    @RequestMapping(value = "write/{boardId}", method = RequestMethod.POST)
     public ResponseEntity uploadPost(@RequestBody String jsonData, @PathVariable Integer boardId) {
         Gson gson = new Gson();
 
         Type type = new TypeToken<Map<String, String>>(){}.getType();
         Map<String, String> postInfo = gson.fromJson(jsonData, type);
 
-        if(postService.uploadPost(Integer.parseInt(postInfo.get("boardId")), postInfo.get("title"), postInfo.get("content"))){
+        if(postService.uploadPost(boardId, postInfo.get("title"), postInfo.get("content"))){
+            return ResponseEntity.ok().build();
+        }
+        else{
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @RequestMapping(value = "update/{boardId}/{seq}", method = RequestMethod.POST)
+    public ResponseEntity updatePost(@RequestBody String jsonData, @PathVariable Integer boardId, @PathVariable Integer seq) {
+        Gson gson = new Gson();
+
+        Type type = new TypeToken<Map<String, String>>(){}.getType();
+        Map<String, String> postInfo = gson.fromJson(jsonData, type);
+
+        if(postService.updatePost(boardId, seq, postInfo.get("title"), postInfo.get("content"))){
             return ResponseEntity.ok().build();
         }
         else{
