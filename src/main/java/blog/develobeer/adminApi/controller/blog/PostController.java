@@ -71,10 +71,11 @@ public class PostController {
         Type type = new TypeToken<Map<String, String>>(){}.getType();
         Map<String, String> postInfo = gson.fromJson(jsonData, type);
 
-        if(postService.updatePost(boardId, seq, postInfo.get("title"), postInfo.get("content"))){
-            return ResponseEntity.ok().build();
+        try{
+            return new ResponseEntity(postService.updatePost(boardId, seq, postInfo.get("title"), postInfo.get("content")), HttpStatus.OK);
         }
-        else{
+        catch(Exception e){
+            e.printStackTrace();
             return ResponseEntity.badRequest().build();
         }
     }

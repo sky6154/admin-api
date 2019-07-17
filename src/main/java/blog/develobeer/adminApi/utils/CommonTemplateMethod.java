@@ -37,4 +37,14 @@ public class CommonTemplateMethod {
             return false;
         }
     }
+
+    public static <T, ID> T simpleSaveTryCatchObjectReturn(JpaRepository<T, ID> repo, T model){
+        try{
+            return repo.saveAndFlush(model);
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

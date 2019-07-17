@@ -126,12 +126,14 @@ public class PostService {
         blogPost.setBoardId(boardId);
         blogPost.setTitle(title);
         blogPost.setContent(content);
-        blogPost.setAuthor("kokj");
+
+        Principal principal = (Principal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        blogPost.setAuthor(principal.getName());
 
         return CommonTemplateMethod.simpleSaveTryCatchBooleanReturn(blogPostRepository, blogPost);
     }
 
-    public boolean updatePost(int boardId, int seq, String title, String content) {
+    public BlogPost updatePost(int boardId, int seq, String title, String content) {
         Optional<BlogPost> blogPostOptional = blogPostRepository.findById(seq);
 
         if(blogPostOptional.isPresent()){
@@ -140,16 +142,16 @@ public class PostService {
             post.setBoardId(boardId);
             post.setTitle(title);
             post.setContent(content);
-            post.setAuthor("kokj");
+
+            Principal principal = (Principal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            post.setAuthor(principal.getName());
             post.setModifyDate(Timestamp.valueOf(LocalDateTime.now()));
 
-            return CommonTemplateMethod.simpleSaveTryCatchBooleanReturn(blogPostRepository, post);
+            return CommonTemplateMethod.simpleSaveTryCatchObjectReturn(blogPostRepository, post);
         }
         else{
             throw new NoResultException("Post does not exist.");
         }
-
-
     }
 
     public List<BlogPost> getPostList(int boardId){
