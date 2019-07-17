@@ -3,6 +3,7 @@ package blog.develobeer.adminApi.controller.blog;
 import blog.develobeer.adminApi.service.PostService;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -53,14 +55,16 @@ public class PostController {
         Map<String, String> postInfo = gson.fromJson(jsonData, type);
 
         if(postService.uploadPost(boardId, postInfo.get("title"), postInfo.get("content"))){
-            return ResponseEntity.ok().build();
+            URI uri = ControllerLinkBuilder.linkTo(PostController.class).slash(boardId).toUri();
+
+            return ResponseEntity.created(uri).build();
         }
         else{
             return ResponseEntity.badRequest().build();
         }
     }
 
-    @RequestMapping(value = "update/{boardId}/{seq}", method = RequestMethod.POST)
+    @RequestMapping(value = "update/{boardId}/{seq}", method = RequestMethod.PUT)
     public ResponseEntity updatePost(@RequestBody String jsonData, @PathVariable Integer boardId, @PathVariable Integer seq) {
         Gson gson = new Gson();
 
