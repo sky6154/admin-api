@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.NoResultException;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URI;
@@ -22,13 +23,14 @@ import java.util.Map;
 public class PostController {
 
     private final PostService postService;
+    private static final Gson gson = new Gson();
 
     public PostController(PostService postService){
         this.postService = postService;
     }
 
     @RequestMapping(value = "/uploadFile/{boardId}", method = RequestMethod.POST)
-    public ResponseEntity uploadFile(MultipartFile[] files, @PathVariable Integer boardId) {
+    public ResponseEntity uploadFile(MultipartFile[] files, @PathVariable Integer boardId) throws Exception {
         List<Map<String, String>> result = new ArrayList<>();
 
         if(files == null || files.length < 1){
@@ -36,58 +38,37 @@ public class PostController {
         }
 
         for(int index = 0; index < files.length; index++){
-            try {
-                result.add(postService.uploadFile(boardId, index, files[index]));
-            } catch (Exception e) {
-                e.printStackTrace();
-                return new ResponseEntity<>(files[index].getOriginalFilename(), HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+            result.add(postService.uploadFile(boardId, index, files[index]));
         }
 
         return ResponseEntity.ok(result);
-    }
+}
 
     @RequestMapping(value = "write/{boardId}", method = RequestMethod.POST)
     public ResponseEntity uploadPost(@RequestBody String jsonData, @PathVariable Integer boardId) {
-        Gson gson = new Gson();
-
         Type type = new TypeToken<Map<String, String>>(){}.getType();
         Map<String, String> postInfo = gson.fromJson(jsonData, type);
 
-        if(postService.uploadPost(boardId, postInfo.get("title"), postInfo.get("content"))){
-            URI uri = ControllerLinkBuilder.linkTo(PostController.class).slash(boardId).toUri();
+        URI uri = ControllerLinkBuilder.linkTo(PostController.class).slash("write/").slash(boardId).toUri();
 
-            return ResponseEntity.created(uri).build();
-        }
-        else{
-            return ResponseEntity.badRequest().build();
-        }
+        return ResponseEntity.created(uri).body( postService.uploadPost(boardId, postInfo.get("title"), postInfo.get("content")) );
     }
 
-    @RequestMapping(value = "update/{boardId}/{seq}", method = RequestMethod.PUT)
+    @RequestMapping(value = "update/{boardId}/post/{seq}", method = RequestMethod.PUT)
     public ResponseEntity updatePost(@RequestBody String jsonData, @PathVariable Integer boardId, @PathVariable Integer seq) {
-        Gson gson = new Gson();
-
         Type type = new TypeToken<Map<String, String>>(){}.getType();
         Map<String, String> postInfo = gson.fromJson(jsonData, type);
 
-        try{
-            return new ResponseEntity(postService.updatePost(boardId, seq, postInfo.get("title"), postInfo.get("content")), HttpStatus.OK);
-        }
-        catch(Exception e){
-            e.printStackTrace();
-            return ResponseEntity.badRequest().build();
-        }
+        return ResponseEntity.ok( postService.updatePost(boardId, seq, postInfo.get("title"), postInfo.get("content")) );
+    }
+
+    @RequestMapping(value = "delete/{seq}", method = RequestMethod.DELETE)
+    public ResponseEntity updatePost(@PathVariable Integer seq) {
+        return ResponseEntity.ok( postService.deletePost(seq) );
     }
 
     @RequestMapping(value = "/list/{boardId}", method = RequestMethod.GET)
     public ResponseEntity getList(@PathVariable Integer boardId) {
-        try {
-            return ResponseEntity.ok(postService.getPostList(boardId));
-        }
-        catch (Exception e){
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return ResponseEntity.ok( postService.getPostList(boardId) );
     }
 }

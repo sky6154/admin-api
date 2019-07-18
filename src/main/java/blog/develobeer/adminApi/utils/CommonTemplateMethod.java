@@ -38,6 +38,17 @@ public class CommonTemplateMethod {
         }
     }
 
+    public static <T, ID> boolean simpleDeleteByIdTryCatchBooleanReturn(JpaRepository<T, ID> repo, ID id){
+        try{
+            repo.deleteById(id);
+            return true;
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public static <T, ID> T simpleSaveTryCatchObjectReturn(JpaRepository<T, ID> repo, T model){
         try{
             return repo.saveAndFlush(model);

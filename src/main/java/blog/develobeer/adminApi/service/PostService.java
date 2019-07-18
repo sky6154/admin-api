@@ -120,7 +120,7 @@ public class PostService {
         }
     }
 
-    public boolean uploadPost(Integer boardId, String title, String content) {
+    public BlogPost uploadPost(Integer boardId, String title, String content) {
         BlogPost blogPost = new BlogPost();
 
         blogPost.setBoardId(boardId);
@@ -130,7 +130,7 @@ public class PostService {
         Principal principal = (Principal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         blogPost.setAuthor(principal.getName());
 
-        return CommonTemplateMethod.simpleSaveTryCatchBooleanReturn(blogPostRepository, blogPost);
+        return blogPostRepository.saveAndFlush(blogPost);
     }
 
     public BlogPost updatePost(int boardId, int seq, String title, String content) {
@@ -145,6 +145,22 @@ public class PostService {
 
             Principal principal = (Principal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             post.setAuthor(principal.getName());
+            post.setModifyDate(Timestamp.valueOf(LocalDateTime.now()));
+
+            return CommonTemplateMethod.simpleSaveTryCatchObjectReturn(blogPostRepository, post);
+        }
+        else{
+            throw new NoResultException("Post does not exist.");
+        }
+    }
+
+    public BlogPost deletePost(int seq) {
+        Optional<BlogPost> blogPostOptional = blogPostRepository.findById(seq);
+
+        if(blogPostOptional.isPresent()){
+            BlogPost post = blogPostOptional.get();
+
+            post.setIsDelete(true);
             post.setModifyDate(Timestamp.valueOf(LocalDateTime.now()));
 
             return CommonTemplateMethod.simpleSaveTryCatchObjectReturn(blogPostRepository, post);
