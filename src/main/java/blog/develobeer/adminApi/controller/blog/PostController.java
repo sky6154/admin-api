@@ -63,8 +63,13 @@ public class PostController {
     }
 
     @RequestMapping(value = "delete/{seq}", method = RequestMethod.DELETE)
-    public ResponseEntity updatePost(@PathVariable Integer seq) {
+    public ResponseEntity deletePost(@PathVariable Integer seq) {
         return ResponseEntity.ok( postService.deletePost(seq) );
+    }
+
+    @RequestMapping(value = "restore/{seq}", method = RequestMethod.PATCH)
+    public ResponseEntity restorePost(@PathVariable Integer seq) {
+        return ResponseEntity.ok( postService.restorePost(seq) );
     }
 
     @RequestMapping(value = "/list/{boardId}", method = RequestMethod.GET)

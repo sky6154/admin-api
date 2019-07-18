@@ -170,6 +170,22 @@ public class PostService {
         }
     }
 
+    public BlogPost restorePost(int seq) {
+        Optional<BlogPost> blogPostOptional = blogPostRepository.findById(seq);
+
+        if(blogPostOptional.isPresent()){
+            BlogPost post = blogPostOptional.get();
+
+            post.setIsDelete(false);
+            post.setModifyDate(Timestamp.valueOf(LocalDateTime.now()));
+
+            return CommonTemplateMethod.simpleSaveTryCatchObjectReturn(blogPostRepository, post);
+        }
+        else{
+            throw new NoResultException("Post does not exist.");
+        }
+    }
+
     public List<BlogPost> getPostList(int boardId){
         return blogPostRepository.findAllByBoardIdOrderBySeqDesc(boardId);
     }
