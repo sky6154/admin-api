@@ -50,7 +50,7 @@ public class AdminController {
     }
 
     @RequestMapping(value = "/add", method = RequestMethod.POST, consumes = "application/json")
-    public ResponseEntity add(@RequestBody String json, UriComponentsBuilder b) {
+    public ResponseEntity add(@RequestBody String json) {
         JsonParser parser = new JsonParser();
         JsonObject jsonObject = parser.parse(json).getAsJsonObject();
 
@@ -84,7 +84,7 @@ public class AdminController {
 
         adminService.addAdminRole(adminRoleList);
 
-        URI uri = ControllerLinkBuilder.linkTo(AdminController.class).slash("add/").slash(result.getId()).toUri();
+        URI uri = ControllerLinkBuilder.linkTo(AdminController.class).slash("add").slash(result.getId()).toUri();
         result.setPwd(null);
 
         return ResponseEntity.created(uri).body(result);

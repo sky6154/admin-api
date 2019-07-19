@@ -26,4 +26,7 @@
 /.nb-gradle/
 
 ### settings ###
-!src/main/resuorces/application.yml
+src/main/resources/application.yml
+
+### querydsl ###
+src/main/generated

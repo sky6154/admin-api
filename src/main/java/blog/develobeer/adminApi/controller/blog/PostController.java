@@ -49,7 +49,7 @@ public class PostController {
         Type type = new TypeToken<Map<String, String>>(){}.getType();
         Map<String, String> postInfo = gson.fromJson(jsonData, type);
 
-        URI uri = ControllerLinkBuilder.linkTo(PostController.class).slash("write/").slash(boardId).toUri();
+        URI uri = ControllerLinkBuilder.linkTo(PostController.class).slash("write").slash(boardId).toUri();
 
         return ResponseEntity.created(uri).body( postService.uploadPost(boardId, postInfo.get("title"), postInfo.get("content")) );
     }
