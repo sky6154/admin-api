@@ -9,11 +9,19 @@ import javax.persistence.PersistenceContext;
 
 @Configuration
 public class QuerydslConfig {
-    @PersistenceContext
-    private EntityManager entityManager;
+    @PersistenceContext(unitName = "blog")
+    private EntityManager blogEntityManager;
 
-    @Bean
-    public JPAQueryFactory jpaQueryFactory(){
-        return new JPAQueryFactory(entityManager);
+    @PersistenceContext(unitName = "admin")
+    private EntityManager adminEntityManager;
+
+    @Bean(name="blogQueryFactory")
+    public JPAQueryFactory blogQueryFactory(){
+        return new JPAQueryFactory(blogEntityManager);
+    }
+
+    @Bean(name="adminQueryFactory")
+    public JPAQueryFactory adminQueryFactory(){
+        return new JPAQueryFactory(adminEntityManager);
     }
 }

@@ -2,12 +2,10 @@ package blog.develobeer.adminApi.domain.admin.role;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 
-import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
@@ -15,12 +13,15 @@ import java.sql.Timestamp;
 @Getter
 @Entity
 @Table(name="user_role")
+@ToString
 public class AdminRole implements Serializable {
     @EmbeddedId
     private AdminRoleId adminRoleId;
 
+    @Transient
     private String id;
 
+    @Transient
     private String role;
 
     @CreationTimestamp
