@@ -1,7 +1,9 @@
 package blog.develobeer.adminApi.domain.admin.user;
 
+import blog.develobeer.adminApi.domain.admin.role.Role;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -13,6 +15,7 @@ import java.sql.Timestamp;
 @Getter
 @Entity
 @Table(name="user")
+@ToString
 public class Admin implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -38,6 +41,9 @@ public class Admin implements Serializable {
 
     @Column
     private String email;
+
+    @Transient
+    private Role role;
 
     @Column(name = "modify_date")
     @UpdateTimestamp

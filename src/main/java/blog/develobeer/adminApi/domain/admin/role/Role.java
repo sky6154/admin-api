@@ -2,6 +2,7 @@ package blog.develobeer.adminApi.domain.admin.role;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,6 +14,7 @@ import java.io.Serializable;
 @Getter
 @Entity
 @Table(name="role")
+@ToString
 public class Role implements Serializable {
     @Id
     @Column(name="role_id")

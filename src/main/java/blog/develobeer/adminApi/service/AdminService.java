@@ -103,7 +103,7 @@ public class AdminService implements UserDetailsService {
     }
 
     public List<Admin> getAllAdminList(){
-        List<Admin> adminList = adminRepository.findAll();
+        List<Admin> adminList = adminRepository.getAdminList();
 
         for(int i = 0; i < adminList.size(); i++){
             adminList.get(i).setPwd(null);
