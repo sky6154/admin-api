@@ -1,13 +1,22 @@
 version: '3'
 
 services:
-  my_blog_api:
+  my_blog_admin_api:
     build:
       context: .
 
     image: admin-api:latest
 
     container_name: myBlogAdminAPI
+
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+#        reservations:
+#          cpus: '0.50'
+#          memory: 512M
 
     ports:
       - "80:80"
