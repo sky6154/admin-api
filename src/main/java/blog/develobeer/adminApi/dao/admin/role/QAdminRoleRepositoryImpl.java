@@ -2,9 +2,7 @@ package blog.develobeer.adminApi.dao.admin.role;
 
 import blog.develobeer.adminApi.domain.admin.role.AdminRole;
 import blog.develobeer.adminApi.domain.admin.role.AdminRoleId;
-import blog.develobeer.adminApi.domain.admin.user.Admin;
 import com.querydsl.core.Tuple;
-import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

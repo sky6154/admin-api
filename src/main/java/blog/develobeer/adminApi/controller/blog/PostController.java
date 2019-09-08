@@ -3,6 +3,7 @@ package blog.develobeer.adminApi.controller.blog;
 import blog.develobeer.adminApi.service.PostService;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,7 @@ public class PostController {
     private final PostService postService;
     private static final Gson gson = new Gson();
 
+    @Autowired
     public PostController(PostService postService){
         this.postService = postService;
     }

@@ -13,7 +13,7 @@ public class DevelobeerAuthenticationToken extends AbstractAuthenticationToken {
 
     private UserDetails userDetails;
 
-    public DevelobeerAuthenticationToken(UserDetails userDetails) {
+    DevelobeerAuthenticationToken(UserDetails userDetails) {
         super(null);
 
         // 위에서 토큰 체크를 해주었다고 가정한 후 인증처리를 한다.
@@ -39,16 +39,12 @@ public class DevelobeerAuthenticationToken extends AbstractAuthenticationToken {
     }
 
     public static String[] splitToken(String decodedString){
-        String[] info = decodedString.split(":");
-
-        return info;
+        return decodedString.split(":");
     }
 
     public static String encode(String id, String sessionId){
         String makeOneString = id + ":" + sessionId;
-        String token = TokenManager.encrypt(makeOneString);
-
-        return token;
+        return TokenManager.encrypt(makeOneString);
     }
 
     public static String decode(String token){

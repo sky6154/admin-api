@@ -45,7 +45,6 @@ public class AdminService implements UserDetailsService {
                 .map(admin -> new UserDetails() {
                     @Override
                     public Collection<? extends GrantedAuthority> getAuthorities() {
-//                        List<AdminRole> adminRoles = adminRoleRepository.getAdminRolesByUserId(admin.getId()).orElse(Collections.emptyList());
                         List<AdminRole> adminRoles = adminRoleRepository.getAdminRolesByUserId(admin.getId());
 
                         return adminRoles
@@ -103,12 +102,6 @@ public class AdminService implements UserDetailsService {
     }
 
     public List<Admin> getAllAdminList(){
-        List<Admin> adminList = adminRepository.getAdminList();
-
-        for(int i = 0; i < adminList.size(); i++){
-            adminList.get(i).setPwd(null);
-        }
-
-        return adminList;
+        return adminRepository.getAdminList();
     }
 }

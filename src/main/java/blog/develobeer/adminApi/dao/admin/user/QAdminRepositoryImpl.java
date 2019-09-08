@@ -1,7 +1,5 @@
 package blog.develobeer.adminApi.dao.admin.user;
 
-import blog.develobeer.adminApi.domain.admin.role.AdminRole;
-import blog.develobeer.adminApi.domain.admin.role.AdminRoleId;
 import blog.develobeer.adminApi.domain.admin.user.Admin;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;

@@ -22,7 +22,12 @@ apply plugin: "com.ewerk.gradle.plugins.querydsl"
 
 group = 'blog.develobeer'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = 10
+sourceCompatibility = 11
+
+bootJar{
+    project.ext.set("archiveBaseName", "develobeer-admin");
+    project.ext.set("archiveVersion", "lastest");
+}
 
 repositories {
     mavenCentral()
@@ -42,11 +47,6 @@ sourceSets {
             srcDirs = ['src/main/java', queryDslGeneratedDir]
         }
     }
-}
-
-bootJar {
-    baseName = 'develobeer'
-    version = 'latest'
 }
 
 dependencies {

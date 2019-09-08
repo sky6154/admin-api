@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  my_blog_api:
+    build:
+      context: .
+
+    image: admin-api:latest
+
+    container_name: myBlogAdminAPI
+
+    ports:
+      - "80:80"
+
+    command: >
+      -c "
+      java -Djava.security.egd=file:/dev/./urandom -Dspring.profiles.active=live -jar /develobeer-admin.jar -server -Xmx1g
+      "
