@@ -19,7 +19,7 @@ services:
 #          memory: 512M
 
     ports:
-      - "80:80"
+      - "8888:80"
 
     command: >
       -c "
