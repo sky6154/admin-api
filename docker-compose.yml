@@ -9,6 +9,9 @@ services:
 
     container_name: myBlogAdminAPI
 
+    volumes:
+      - /static:/var/www
+
     deploy:
       resources:
         limits:
