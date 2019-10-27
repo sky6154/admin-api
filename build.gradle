@@ -74,6 +74,8 @@ dependencies {
 
     compile("com.querydsl:querydsl-jpa")
     compile("com.querydsl:querydsl-apt")
+
+    compile group: 'org.apache.xmlbeans', name: 'xmlbeans', version: '3.0.0'
 }
 
 wrapper {
