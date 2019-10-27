@@ -1,4 +1,4 @@
-FROM openjdk:11-jdk-slim
+FROM openjdk:14-jdk-slim
 MAINTAINER kokj <sky6154@gmail.com>
 
 VOLUME /tmp
