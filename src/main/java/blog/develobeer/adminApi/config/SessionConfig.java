@@ -28,9 +28,6 @@ public class SessionConfig {
     @Value("${spring.redis.port}")
     private int redisPort;
 
-    @Value("#{'${spring.profiles}' == 'test' ? '${spring.redis.password}' : null}")
-    private String redisPassword;
-
     private final Environment env;
 
     @Autowired
@@ -43,6 +40,8 @@ public class SessionConfig {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(redisHost, redisPort);
 
         if(Arrays.asList(env.getActiveProfiles()).contains("test")){
+            String redisPassword = env.getProperty("spring.redis.password");
+
             redisStandaloneConfiguration.setPassword(redisPassword);
         }
 
