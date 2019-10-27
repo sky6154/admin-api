@@ -13,4 +13,4 @@
 }
 
 docker load < admin-api.tar
-docker service create --name admin-api --replicas 2 --publish 80:80 admin-api:latest
+docker service create --name admin-api --replicas 2 --publish 8888:8080 admin-api:latest
