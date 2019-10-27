@@ -22,7 +22,8 @@ apply plugin: "com.ewerk.gradle.plugins.querydsl"
 
 group = 'blog.develobeer'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = 1.8
+sourceCompatibility = '11'
+targetCompatibility = '11'
 
 bootJar{
     project.ext.set("archiveBaseName", "develobeer-admin");
