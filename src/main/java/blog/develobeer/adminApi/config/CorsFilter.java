@@ -13,11 +13,14 @@ import java.io.IOException;
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class CorsFilter implements Filter {
+    @Value("${spring.profiles.active}")
+    private String activeProfile;
+
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
 
-        if(allowOrigin.equals("*")){
+        if(activeProfile.equals("test")){
             response.setHeader("Access-Control-Allow-Origin", request.getHeader("origin"));
         }
         else{
