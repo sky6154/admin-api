@@ -4,6 +4,7 @@ import blog.develobeer.adminApi.dao.admin.role.AdminRoleRepository;
 import blog.develobeer.adminApi.dao.admin.user.AdminRepository;
 import blog.develobeer.adminApi.domain.admin.role.AdminRole;
 import blog.develobeer.adminApi.domain.admin.user.Admin;
+import blog.develobeer.adminApi.utils.AdminContext;
 import blog.develobeer.adminApi.utils.CommonTemplateMethod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -103,5 +104,21 @@ public class AdminService implements UserDetailsService {
 
     public List<Admin> getAllAdminList(){
         return adminRepository.getAdminList();
+    }
+
+    public boolean changePassword(String newPassword){
+        Optional<Admin> optionalAdmin = adminRepository.findById(AdminContext.getAdminName());
+
+        if(optionalAdmin.isPresent()){
+            Admin admin = optionalAdmin.get();
+
+            admin.setPwd(passwordEncoder.encode(newPassword));
+            adminRepository.save(admin);
+
+            return true;
+        }
+        else{
+            throw new UsernameNotFoundException("Invalid admin : " + AdminContext.getAdminName());
+        }
     }
 }

@@ -26,7 +26,7 @@ import java.util.Map;
         basePackages = {"blog.develobeer.adminApi.dao.blog"})
 public class BlogDataSourceConfig implements Serializable {
 
-    protected Map<String, Object> jpaProperties() {
+    private Map<String, Object> jpaProperties() {
         Map<String, Object> props = new HashMap<>();
 //        props.put("hibernate.physical_naming_strategy", PhysicalNamingStrategyImpl.class);
         props.put("hibernate.show_sql", true);

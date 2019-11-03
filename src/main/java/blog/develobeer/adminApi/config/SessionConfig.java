@@ -61,7 +61,7 @@ public class SessionConfig {
     }
 
     @Bean
-    RedisSerializer<Object> springSessionDefaultRedisSerializer() {
+    public RedisSerializer<Object> springSessionDefaultRedisSerializer() {
         return new CustomRedisSerializer();
     }
 
@@ -76,7 +76,7 @@ public class SessionConfig {
     }
 
     @Bean
-    ConfigureRedisAction configureRedisAction() {
+    public ConfigureRedisAction configureRedisAction() {
         return ConfigureRedisAction.NO_OP;
     }
 }

@@ -26,9 +26,8 @@ public class SimpleAES256 {
 
     public static String encryptAES256(String msg, String key, int iterationCount, boolean isBase32) throws Exception {
         SecureRandom random = new SecureRandom();
-        byte bytes[] = new byte[20];
-        random.nextBytes(bytes);
-        byte[] saltBytes = bytes;
+        byte[] saltBytes = new byte[20];
+        random.nextBytes(saltBytes);
 
         SecretKeyFactory factory = SecretKeyFactory.getInstance(KEY_FACTORY);
         PBEKeySpec spec = new PBEKeySpec(key.toCharArray(), saltBytes, iterationCount, KEY_LENGTH);
@@ -43,7 +42,6 @@ public class SimpleAES256 {
         byte[] encryptedTextBytes = cipher.doFinal(msg.getBytes(StandardCharsets.UTF_8));
         byte[] buffer = new byte[saltBytes.length + ivBytes.length + encryptedTextBytes.length];
 
-        // Arrays.copyOfRange vs ..?
         System.arraycopy(saltBytes, 0, buffer, 0, saltBytes.length);
         System.arraycopy(ivBytes, 0, buffer, saltBytes.length, ivBytes.length);
         System.arraycopy(encryptedTextBytes, 0, buffer, saltBytes.length + ivBytes.length, encryptedTextBytes.length);

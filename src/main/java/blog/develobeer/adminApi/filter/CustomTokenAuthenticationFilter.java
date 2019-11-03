@@ -1,7 +1,7 @@
 package blog.develobeer.adminApi.filter;
 
-import blog.develobeer.adminApi.service.TokenService;
 import blog.develobeer.adminApi.service.AdminService;
+import blog.develobeer.adminApi.service.TokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.*;
@@ -37,9 +37,6 @@ public class CustomTokenAuthenticationFilter extends AbstractAuthenticationProce
         setAuthenticationSuccessHandler(new TokenSimpleUrlAuthenticationSuccessHandler());
     }
 
-    /**
-     * Attempt to authenticate request - basically just pass over to another method to authenticate request headers
-     */
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
         // chrome preflight options인 경우 pass 한다.
@@ -58,11 +55,6 @@ public class CustomTokenAuthenticationFilter extends AbstractAuthenticationProce
     }
 
 
-    /**
-     * authenticate the user based on token
-     *
-     * @return
-     */
     private AbstractAuthenticationToken authUserByToken(String token) {
         if (token == null) {
             return null;

@@ -27,7 +27,7 @@ import java.util.Map;
         basePackages = {"blog.develobeer.adminApi.dao.admin"})
 public class AdminDataSourceConfig implements Serializable {
 
-    protected Map<String, Object> jpaProperties() {
+    private Map<String, Object> jpaProperties() {
         Map<String, Object> props = new HashMap<>();
         props.put("hibernate.show_sql", true);
         props.put("hibernate.database_platform", "org.hibernate.dialect.MySQL5InnoDBDialect");

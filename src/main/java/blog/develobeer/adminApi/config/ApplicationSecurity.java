@@ -19,9 +19,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
-import org.springframework.session.FindByIndexNameSessionRepository;
-import org.springframework.session.Session;
-import org.springframework.session.security.SpringSessionBackedSessionRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,17 +28,14 @@ import java.util.List;
 public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
 
     private final AdminService adminService;
-//    private final FindByIndexNameSessionRepository<? extends Session> sessionRepository;
     private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public ApplicationSecurity(AdminService adminService,
-//                               FindByIndexNameSessionRepository<? extends Session> sessionRepository,
                                RestAuthenticationEntryPoint restAuthenticationEntryPoint,
                                PasswordEncoder passwordEncoder) {
         this.adminService = adminService;
-//        this.sessionRepository = sessionRepository;
         this.restAuthenticationEntryPoint = restAuthenticationEntryPoint;
         this.passwordEncoder = passwordEncoder;
     }
@@ -55,10 +49,6 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
                 .disable()
                 .httpBasic().disable()
                 .sessionManagement()
-//                .maximumSessions(1)
-//                .sessionRegistry(sessionRegistry())
-//                .maxSessionsPreventsLogin(true)
-//                .and()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .addFilterBefore(customTokenAuthenticationFilter(AUTHENTICATION_REQUIRED_PATTERN), UsernamePasswordAuthenticationFilter.class)
@@ -77,8 +67,6 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
                 .logout()
                 .logoutUrl("/logout")
                 .logoutSuccessHandler(new MyLogoutSuccessHandler());
-//                  .invalidateHttpSession(true);
-
     }
 
     private CustomTokenAuthenticationFilter customTokenAuthenticationFilter(String[] patterns) throws Exception {
@@ -94,15 +82,8 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
             requestMatchers.add(requestMatcher);
         }
 
-        OrRequestMatcher orRequestMatcher = new OrRequestMatcher(requestMatchers);
-
-        return orRequestMatcher;
+        return new OrRequestMatcher(requestMatchers);
     }
-
-//    @Bean
-//    public SpringSessionBackedSessionRegistry sessionRegistry() {
-//        return new SpringSessionBackedSessionRegistry(this.sessionRepository);
-//    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -114,15 +95,4 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
-
-//
-//    @Bean
-//    public HttpSessionEventPublisher httpSessionEventPublisher() {
-//        return new HttpSessionEventPublisher();
-//    }
-
-//    @Bean
-//    GrantedAuthorityDefaults grantedAuthorityDefaults() {
-//        return new GrantedAuthorityDefaults(""); // Remove the ROLE_ prefix
-//    }
 }

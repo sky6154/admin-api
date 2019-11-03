@@ -1,7 +1,6 @@
 package blog.develobeer.adminApi.controller.admin;
 
 import blog.develobeer.adminApi.config.GsonDateDeserializer;
-import blog.develobeer.adminApi.controller.blog.PostController;
 import blog.develobeer.adminApi.domain.admin.role.AdminRole;
 import blog.develobeer.adminApi.domain.admin.role.AdminRoleId;
 import blog.develobeer.adminApi.domain.admin.role.Role;
@@ -15,11 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletResponse;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
@@ -93,5 +92,10 @@ public class AdminController {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public Iterable<Admin> getAllAdminList() {
         return adminService.getAllAdminList();
+    }
+
+    @RequestMapping(value = "/password/change", method = RequestMethod.POST)
+    public boolean changePassword(@RequestBody String newPassword){
+        return adminService.changePassword(newPassword);
     }
 }

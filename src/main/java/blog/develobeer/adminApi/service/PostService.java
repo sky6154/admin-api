@@ -2,12 +2,12 @@ package blog.develobeer.adminApi.service;
 
 import blog.develobeer.adminApi.dao.blog.BlogPostRepository;
 import blog.develobeer.adminApi.domain.blog.BlogPost;
+import blog.develobeer.adminApi.utils.AdminContext;
 import blog.develobeer.adminApi.utils.CommonTemplateMethod;
 import blog.develobeer.adminApi.utils.SimpleAES256;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,10 +29,14 @@ public class PostService {
 
     private final BlogPostRepository blogPostRepository;
 
-    private static String UPLOAD_ROOT;
-    private static String ACCESS_ADDR;
+    @Value("${path.upload-root}")
+    private String UPLOAD_ROOT;
+    @Value("${path.access-addr}")
+    private String ACCESS_ADDR;
 
-    private static int ITERATION_COUNT;
+    @Value("${secure.image.iteration-count}")
+    private int ITERATION_COUNT;
+    @Value("${secure.image.key}")
     private static String KEY;
 
     private static final String BOARD_FOLDER = "board/";
@@ -43,28 +47,7 @@ public class PostService {
         this.blogPostRepository = blogPostRepository;
     }
 
-    @Autowired
-    public void setUploadRoot(@Value("${path.upload-root}") String uploadRoot) {
-        this.UPLOAD_ROOT = uploadRoot;
-    }
-
-    @Autowired
-    public void setAccessAddr(@Value("${path.access-addr}") String accessAddr) {
-        this.ACCESS_ADDR = accessAddr;
-    }
-
-    @Autowired
-    public void setIterationCount(@Value("${secure.image.iteration-count}") int iterationCount) {
-        this.ITERATION_COUNT = iterationCount;
-    }
-
-    @Autowired
-    public void setKey(@Value("${secure.image.key}") String key) {
-        this.KEY = key;
-    }
-
-
-    public Map<String, String> uploadFile(Integer boardId, int index, MultipartFile file) throws IOException, Exception {
+    public Map<String, String> uploadFile(Integer boardId, int index, MultipartFile file) throws Exception {
         Map<String, String> result = new HashMap<>();
 
         if (file == null) {
@@ -80,9 +63,6 @@ public class PostService {
             int counter = 2;
             int dot = file.getOriginalFilename().lastIndexOf('.');
 
-            Timestamp now = new Timestamp(System.currentTimeMillis());
-            Principal principal = (Principal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
             String fileName = file.getOriginalFilename();
             String extension = "";
 
@@ -92,7 +72,7 @@ public class PostService {
             }
 
             boolean isBase32 = true;
-            String baseFileName = boardId + FILE_SEPARATOR + fileName + FILE_SEPARATOR + principal.getName() + FILE_SEPARATOR + now;
+            String baseFileName = boardId + FILE_SEPARATOR + fileName + FILE_SEPARATOR + AdminContext.getAdminName() + FILE_SEPARATOR + System.currentTimeMillis();
             baseFileName = SimpleAES256.encryptAES256(baseFileName, KEY, ITERATION_COUNT, isBase32);
 
             fileName = baseFileName + "." + extension;
@@ -127,8 +107,7 @@ public class PostService {
         blogPost.setTitle(title);
         blogPost.setContent(content);
 
-        Principal principal = (Principal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        blogPost.setAuthor(principal.getName());
+        blogPost.setAuthor(AdminContext.getAdminName());
 
         return blogPostRepository.saveAndFlush(blogPost);
     }
@@ -143,8 +122,7 @@ public class PostService {
             post.setTitle(title);
             post.setContent(content);
 
-            Principal principal = (Principal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            post.setAuthor(principal.getName());
+            post.setAuthor(AdminContext.getAdminName());
             post.setModifyDate(Timestamp.valueOf(LocalDateTime.now()));
 
             return CommonTemplateMethod.simpleSaveTryCatchObjectReturn(blogPostRepository, post);
