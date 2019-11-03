@@ -13,9 +13,6 @@ import java.io.IOException;
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class CorsFilter implements Filter {
-    @Value("${spring.origin}")
-    private String allowOrigin;
-
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
@@ -24,7 +21,7 @@ public class CorsFilter implements Filter {
             response.setHeader("Access-Control-Allow-Origin", request.getHeader("origin"));
         }
         else{
-            response.setHeader("Access-Control-Allow-Origin", allowOrigin);
+            response.setHeader("Access-Control-Allow-Origin", "https://admin.develobeer.blog");
         }
 
         response.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, OPTIONS, DELETE, PATCH");
