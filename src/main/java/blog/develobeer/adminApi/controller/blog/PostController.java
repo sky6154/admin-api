@@ -2,7 +2,6 @@ package blog.develobeer.adminApi.controller.blog;
 
 import blog.develobeer.adminApi.domain.blog.BlogPost;
 import blog.develobeer.adminApi.service.PostService;
-import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.ResponseEntity;

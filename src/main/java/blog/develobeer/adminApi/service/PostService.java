@@ -7,7 +7,6 @@ import blog.develobeer.adminApi.utils.CommonTemplateMethod;
 import blog.develobeer.adminApi.utils.SimpleAES256;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,7 +15,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.Principal;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.HashMap;

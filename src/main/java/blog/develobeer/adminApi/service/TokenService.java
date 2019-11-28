@@ -4,14 +4,15 @@ import blog.develobeer.adminApi.domain.admin.user.AuthenticationRequest;
 import blog.develobeer.adminApi.domain.admin.user.AuthenticationToken;
 import blog.develobeer.adminApi.filter.DevelobeerAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.*;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.CredentialsExpiredException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.session.FindByIndexNameSessionRepository;
 import org.springframework.session.MapSession;
-import org.springframework.session.Session;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
