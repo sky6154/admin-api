@@ -3,6 +3,7 @@ package blog.develobeer.adminApi.filter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import sun.tools.jstat.Token;
 
 import javax.crypto.Cipher;
 import java.nio.charset.StandardCharsets;
@@ -18,8 +19,12 @@ public class TokenManager {
     private static PrivateKey privateKey;
     private static PublicKey publicKey;
 
-    @Autowired
-    public void setPrivateKey(@Value("${key.private-key}") String privateKey){
+    TokenManager(@Value("${key.private-key}") String privateKey, @Value("${key.public-key}") String publicKey){
+        this.setPrivateKey(privateKey);
+        this.setPublicKey(publicKey);
+    }
+
+    private void setPrivateKey(String privateKey){
         try{
             String privateKeyContent = privateKey.replaceAll("\\n", "")
                     .replace("-----BEGIN PRIVATE KEY-----", "")
@@ -28,16 +33,15 @@ public class TokenManager {
 
             PKCS8EncodedKeySpec keySpecPKCS8 = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKeyContent));
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            this.privateKey = keyFactory.generatePrivate(keySpecPKCS8);
+            TokenManager.privateKey = keyFactory.generatePrivate(keySpecPKCS8);
         }
         catch(Exception e){
             e.printStackTrace();
-            this.privateKey = null;
+            TokenManager.privateKey = null;
         }
     }
 
-    @Autowired
-    public void setPublicKey(@Value("${key.public-key}") String publicKey){
+    private void setPublicKey(String publicKey){
         try{
             String publicKeyContent = publicKey.replaceAll("\\n", "")
                     .replace("-----BEGIN PUBLIC KEY-----", "")
@@ -46,11 +50,11 @@ public class TokenManager {
 
             X509EncodedKeySpec keySpecX509 = new X509EncodedKeySpec(Base64.getDecoder().decode(publicKeyContent));
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            this.publicKey = keyFactory.generatePublic(keySpecX509);
+            TokenManager.publicKey = keyFactory.generatePublic(keySpecX509);
         }
         catch(Exception e){
             e.printStackTrace();
-            this.publicKey = null;
+            TokenManager.publicKey = null;
         }
     }
 
@@ -60,9 +64,7 @@ public class TokenManager {
             cipher.init(Cipher.ENCRYPT_MODE, publicKey);
 
             byte[] bytePlain = cipher.doFinal(plainText.getBytes(StandardCharsets.UTF_8));
-            String encrypted = Base64.getEncoder().encodeToString(bytePlain);
-
-            return encrypted;
+            return Base64.getEncoder().encodeToString(bytePlain);
         }
         catch(Exception e){
             e.printStackTrace();
@@ -79,9 +81,7 @@ public class TokenManager {
 
                 byte[] byteEncrypted = Base64.getDecoder().decode(encryptedText.getBytes(StandardCharsets.UTF_8));
                 byte[] bytePlain = cipher.doFinal(byteEncrypted);
-                String decrypted = new String(bytePlain, "utf-8");
-
-                return decrypted;
+                return new String(bytePlain, StandardCharsets.UTF_8);
             }
             catch(Exception e){
                 e.printStackTrace();

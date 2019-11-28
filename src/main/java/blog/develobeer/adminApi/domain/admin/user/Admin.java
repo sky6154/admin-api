@@ -17,7 +17,8 @@ import java.sql.Timestamp;
 @Table(name="user")
 @ToString
 public class Admin implements Serializable {
-    private static final long serialVersionUID = 1L;
+
+    private static final long serialVersionUID = 4987321495242877070L;
 
     @Id
     @Column

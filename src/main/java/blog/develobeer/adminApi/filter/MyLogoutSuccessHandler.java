@@ -19,7 +19,7 @@ public class MyLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler {
 
 
     @Override
-    public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+    public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
 
         ServletContext servletContext = request.getServletContext();
         WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
@@ -33,10 +33,10 @@ public class MyLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler {
                 response.sendError(HttpServletResponse.SC_OK);
             } catch (Exception e) {
                 e.printStackTrace();
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             }
         } else {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Token is not exist.");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
         }
     }
 

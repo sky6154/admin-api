@@ -19,12 +19,12 @@ public class ExceptionResponseHandler {
     @ExceptionHandler(IOException.class)
     public ResponseEntity exceptionHandler(IOException ioe){
         ioe.printStackTrace();
-        return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity exceptionHandler(Exception e){
         e.printStackTrace();
-        return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
 }

@@ -1,6 +1,8 @@
 package blog.develobeer.adminApi.filter;
 
 import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.security.Principal;
@@ -39,7 +41,14 @@ public class DevelobeerAuthenticationToken extends AbstractAuthenticationToken {
     }
 
     public static String[] splitToken(String decodedString){
-        return decodedString.split(":");
+        String[] list = decodedString.split(":");
+
+        if(list.length < 1){
+            throw new AuthenticationCredentialsNotFoundException("Token is not found.");
+        }
+        else{
+            return list;
+        }
     }
 
     public static String encode(String id, String sessionId){
@@ -48,7 +57,14 @@ public class DevelobeerAuthenticationToken extends AbstractAuthenticationToken {
     }
 
     public static String decode(String token){
-        return TokenManager.decrypt(token);
+        String decrypted = TokenManager.decrypt(token);
+
+        if(decrypted == null){
+            throw new AuthenticationServiceException("Invalid token");
+        }
+        else{
+            return decrypted;
+        }
     }
 
 }

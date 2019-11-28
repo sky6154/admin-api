@@ -100,27 +100,21 @@ public class PostService {
         }
     }
 
-    public BlogPost uploadPost(Integer boardId, String title, String content) {
-        BlogPost blogPost = new BlogPost();
-
-        blogPost.setBoardId(boardId);
-        blogPost.setTitle(title);
-        blogPost.setContent(content);
-
+    public BlogPost uploadPost(BlogPost blogPost) {
         blogPost.setAuthor(AdminContext.getAdminName());
 
         return blogPostRepository.saveAndFlush(blogPost);
     }
 
-    public BlogPost updatePost(int boardId, int seq, String title, String content) {
+    public BlogPost updatePost(int boardId, int seq, BlogPost blogPost) {
         Optional<BlogPost> blogPostOptional = blogPostRepository.findById(seq);
 
         if(blogPostOptional.isPresent()){
             BlogPost post = blogPostOptional.get();
 
             post.setBoardId(boardId);
-            post.setTitle(title);
-            post.setContent(content);
+            post.setTitle(blogPost.getTitle());
+            post.setContent(blogPost.getContent());
 
             post.setAuthor(AdminContext.getAdminName());
             post.setModifyDate(Timestamp.valueOf(LocalDateTime.now()));

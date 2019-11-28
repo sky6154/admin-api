@@ -1,15 +1,14 @@
 package blog.develobeer.adminApi.controller.blog;
 
+import blog.develobeer.adminApi.domain.blog.BlogPost;
 import blog.develobeer.adminApi.service.PostService;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +19,6 @@ import java.util.Map;
 public class PostController {
 
     private final PostService postService;
-    private static final Gson gson = new Gson();
 
     @Autowired
     public PostController(PostService postService){
@@ -43,21 +41,15 @@ public class PostController {
 }
 
     @RequestMapping(value = "write/{boardId}", method = RequestMethod.POST)
-    public ResponseEntity uploadPost(@RequestBody String jsonData, @PathVariable Integer boardId) {
-        Type type = new TypeToken<Map<String, String>>(){}.getType();
-        Map<String, String> postInfo = gson.fromJson(jsonData, type);
-
+    public ResponseEntity uploadPost(@RequestBody BlogPost blogPost, @PathVariable Integer boardId) {
         URI uri = ControllerLinkBuilder.linkTo(PostController.class).slash("write").slash(boardId).toUri();
 
-        return ResponseEntity.created(uri).body( postService.uploadPost(boardId, postInfo.get("title"), postInfo.get("content")) );
+        return ResponseEntity.created(uri).body( postService.uploadPost(blogPost) );
     }
 
     @RequestMapping(value = "update/{boardId}/post/{seq}", method = RequestMethod.PUT)
-    public ResponseEntity updatePost(@RequestBody String jsonData, @PathVariable Integer boardId, @PathVariable Integer seq) {
-        Type type = new TypeToken<Map<String, String>>(){}.getType();
-        Map<String, String> postInfo = gson.fromJson(jsonData, type);
-
-        return ResponseEntity.ok( postService.updatePost(boardId, seq, postInfo.get("title"), postInfo.get("content")) );
+    public ResponseEntity updatePost(@RequestBody BlogPost blogPost, @PathVariable Integer boardId, @PathVariable Integer seq) {
+        return ResponseEntity.ok( postService.updatePost(boardId, seq, blogPost) );
     }
 
     @RequestMapping(value = "delete/{seq}", method = RequestMethod.DELETE)

@@ -14,9 +14,7 @@ public class TokenSimpleUrlAuthenticationSuccessHandler extends SimpleUrlAuthent
     protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response) {
         String context = request.getContextPath();
         String fullURL = request.getRequestURI();
-        String url = fullURL.substring(fullURL.indexOf(context) + context.length());
-
-        return url;
+        return fullURL.substring(fullURL.indexOf(context) + context.length());
     }
 
     @Override

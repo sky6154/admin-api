@@ -1,4 +1,4 @@
-package blog.develobeer.adminApi.config;
+package blog.develobeer.adminApi.config.database;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.context.annotation.Bean;
