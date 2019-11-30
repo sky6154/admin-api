@@ -1,7 +1,6 @@
 package blog.develobeer.adminApi.service;
 
 import blog.develobeer.adminApi.domain.admin.user.AuthenticationRequest;
-import blog.develobeer.adminApi.domain.admin.user.AuthenticationToken;
 import blog.develobeer.adminApi.filter.DevelobeerAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,10 +11,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.session.FindByIndexNameSessionRepository;
-import org.springframework.session.MapSession;
+import org.springframework.session.Session;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpSession;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
@@ -35,38 +33,43 @@ public class TokenService {
         this.adminService = adminService;
     }
 
-    public Map<String, MapSession> getSessionByName(String name) {
-        Map<String, MapSession> sessions = sessionRepository.findByPrincipalName(name);
+    public Map<String, ? extends Session> getSessionByName(String name) {
+        Map<String, ? extends Session> sessions = sessionRepository.findByPrincipalName(name);
 
-        if(sessions == null || sessions.size() < 1){
+        if (sessions == null || sessions.size() < 1) {
             throw new CredentialsExpiredException("Token is not found.");
-        }
-        else{
+        } else {
             return sessions;
         }
     }
 
-    public void updateAccessTime(MapSession session) {
+    public void updateAccessTime(Session session) {
         sessionRepository.save(session);
     }
 
-    public AuthenticationToken login(AuthenticationRequest authenticationRequest, HttpSession session) {
+    public boolean login(AuthenticationRequest authenticationRequest) {
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword());
         Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        Map<String, MapSession> sessions = this.getSessionByName(authentication.getName());
+        try {
+            Map<String, ? extends Session> sessions = this.getSessionByName(authentication.getName());
 
-        // 기존 로그인된 세션을 모두 지운다.
-        sessions.forEach((s, o) -> {
-            sessionRepository.deleteById(o.getId());
-        });
+            // 기존 로그인된 세션을 모두 지운다.
+            sessions.forEach((s, o) -> {
+                sessionRepository.deleteById(o.getId());
+            });
+        }
+        catch(CredentialsExpiredException ce){
+            // 토큰이 없을 경우 스킵
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            return false;
+        }
 
-        session.setAttribute(FindByIndexNameSessionRepository.PRINCIPAL_NAME_INDEX_NAME, authentication.getName());
-        String token = DevelobeerAuthenticationToken.encode(authentication.getName(), session.getId());
-
-        return new AuthenticationToken(authentication.getName(), authentication.getAuthorities(), token);
+        return true;
     }
 
     public boolean logout(String token) {
@@ -77,7 +80,7 @@ public class TokenService {
             String userName = info[0];
             String sessionId = info[1];
 
-            Map<String, MapSession> sessions = this.getSessionByName(userName);
+            Map<String, ? extends Session> sessions = this.getSessionByName(userName);
 
             // 기존 로그인된 세션을 모두 지운다.
             sessions.forEach((s, o) -> {
@@ -85,48 +88,9 @@ public class TokenService {
             });
 
             return true;
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
-    }
-
-
-    public Collection<? extends GrantedAuthority> authCheck(String token) {
-        if (token == null) {
-            return null;
-        }
-
-        String decodedString = DevelobeerAuthenticationToken.decode(token);
-        String[] info = DevelobeerAuthenticationToken.splitToken(decodedString);
-
-        String userName = info[0];
-        String sessionId = info[1];
-
-        Map<String, MapSession> result = this.getSessionByName(userName);
-
-        MapSession session = result.get(sessionId);
-
-        if (session == null) {
-            throw new CredentialsExpiredException("Token is invalid.");
-        }
-
-        if (session.isExpired()) {
-            throw new CredentialsExpiredException("Token is expired.");
-        } else {
-            session.setLastAccessedTime(new Date().toInstant());
-            this.updateAccessTime(session);
-
-            UserDetails userDetails = adminService.loadUserByUsername(userName);
-
-            try {
-                return userDetails.getAuthorities();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        return null;
     }
 }

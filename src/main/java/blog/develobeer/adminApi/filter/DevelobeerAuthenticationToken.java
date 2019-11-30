@@ -16,7 +16,7 @@ public class DevelobeerAuthenticationToken extends AbstractAuthenticationToken {
     private UserDetails userDetails;
 
     DevelobeerAuthenticationToken(UserDetails userDetails) {
-        super(null);
+        super(userDetails.getAuthorities());
 
         // 위에서 토큰 체크를 해주었다고 가정한 후 인증처리를 한다.
         super.setAuthenticated(true); // must use super, as we override

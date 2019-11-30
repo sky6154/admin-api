@@ -4,21 +4,19 @@ import blog.develobeer.adminApi.service.AdminService;
 import blog.develobeer.adminApi.service.TokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationServiceException;
-import org.springframework.security.authentication.CredentialsExpiredException;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
-import org.springframework.session.MapSession;
+import org.springframework.session.Session;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.*;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -29,7 +27,7 @@ import java.util.Map;
 public class CustomTokenAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(CustomTokenAuthenticationFilter.class);
-    public final String HEADER_SECURITY_TOKEN = "X-Develobeer-Token";
+    public static final String CUSTOM_TOKEN_HEADER = "X-Develobeer-Token";
 
     private TokenService tokenService;
     private AdminService adminService;
@@ -43,19 +41,37 @@ public class CustomTokenAuthenticationFilter extends AbstractAuthenticationProce
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        // chrome preflight options인 경우 pass 한다.
+//        // chrome preflight options인 경우 pass 한다.
         if (request.getMethod().equals("OPTIONS")) {
             response.setStatus(HttpServletResponse.SC_OK);
             return null;
         }
 
-        String token = request.getHeader(HEADER_SECURITY_TOKEN);
-        AbstractAuthenticationToken userAuthenticationToken = authUserByToken(token);
+        String token = null;
+        Cookie[] cookies = request.getCookies();
 
-        if (userAuthenticationToken == null) {
-            throw new AuthenticationServiceException(MessageFormat.format("Error | {0}", "Bad Token"));
+        if(cookies != null){
+            for (Cookie cookie : request.getCookies()) {
+                if(cookie.getName().equals(CUSTOM_TOKEN_HEADER)) {
+                    token = cookie.getValue();
+                }
+            }
+
+            if(token != null){
+                AbstractAuthenticationToken userAuthenticationToken = authUserByToken(request, token);
+
+                if (userAuthenticationToken == null) {
+                    throw new AuthenticationServiceException("Invalid token.");
+                }
+                return userAuthenticationToken;
+            }
+            else{
+                throw new AuthenticationServiceException("Token not exist.");
+            }
         }
-        return userAuthenticationToken;
+        else{
+            throw new AuthenticationServiceException("Cookie not exist.");
+        }
     }
 
     @Override
@@ -64,11 +80,11 @@ public class CustomTokenAuthenticationFilter extends AbstractAuthenticationProce
             throws IOException {
         SecurityContextHolder.clearContext();
 
-        response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+        response.sendError(HttpServletResponse.SC_FORBIDDEN);
     }
 
 
-    private AbstractAuthenticationToken authUserByToken(String token) {
+    private AbstractAuthenticationToken authUserByToken(HttpServletRequest request, String token) {
         if (token == null) {
             return null;
         }
@@ -79,18 +95,19 @@ public class CustomTokenAuthenticationFilter extends AbstractAuthenticationProce
         String userName = info[0];
         String sessionId = info[1];
 
-        Map<String, MapSession> result = tokenService.getSessionByName(userName);
-
-        MapSession session = result.get(sessionId);
+        Map<String, ? extends Session> result = tokenService.getSessionByName(userName);
+        Session session = result.get(sessionId);
 
         if (session == null || session.isExpired()) {
             throw new CredentialsExpiredException("Invalid token.");
-        } else {
+        }
+        else if(!request.getSession().getId().equals(sessionId)){
+            throw new BadCredentialsException("Invalid session.");
+        }
+        else {
             session.setLastAccessedTime(new Date().toInstant());
-            tokenService.updateAccessTime(session);
 
             UserDetails userDetails = adminService.loadUserByUsername(userName);
-
             DevelobeerAuthenticationToken auth = new DevelobeerAuthenticationToken(userDetails);
 
             try {
