@@ -25,6 +25,7 @@ import java.util.Map;
 @EnableJpaRepositories(
         basePackages = {"blog.develobeer.adminApi.dao.blog"})
 public class BlogDataSourceConfig implements Serializable {
+    private static final long serialVersionUID = 6873287399039965930L;
 
     private Map<String, Object> jpaProperties() {
         Map<String, Object> props = new HashMap<>();

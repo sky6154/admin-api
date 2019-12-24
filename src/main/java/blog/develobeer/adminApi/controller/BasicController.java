@@ -4,7 +4,6 @@ import blog.develobeer.adminApi.domain.admin.user.AuthenticationRequest;
 import blog.develobeer.adminApi.domain.admin.user.AuthenticationToken;
 import blog.develobeer.adminApi.filter.CustomTokenAuthenticationFilter;
 import blog.develobeer.adminApi.filter.DevelobeerAuthenticationToken;
-import blog.develobeer.adminApi.filter.DevelobeerCsrfTokenRepo;
 import blog.develobeer.adminApi.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -16,10 +15,8 @@ import org.springframework.session.FindByIndexNameSessionRepository;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
 import java.util.Collection;
 
 @RestController

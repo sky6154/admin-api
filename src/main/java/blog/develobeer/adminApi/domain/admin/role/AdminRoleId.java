@@ -15,6 +15,8 @@ import java.io.Serializable;
 @EqualsAndHashCode
 @ToString
 public class AdminRoleId implements Serializable {
+    private static final long serialVersionUID = -2844093315347520593L;
+
     @Column(name="user_seq")
     private Integer userSeq;
 

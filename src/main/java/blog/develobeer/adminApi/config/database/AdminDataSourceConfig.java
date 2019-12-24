@@ -26,6 +26,7 @@ import java.util.Map;
         transactionManagerRef = "adminTransactionManager",
         basePackages = {"blog.develobeer.adminApi.dao.admin"})
 public class AdminDataSourceConfig implements Serializable {
+    private static final long serialVersionUID = -2308261361241623735L;
 
     private Map<String, Object> jpaProperties() {
         Map<String, Object> props = new HashMap<>();

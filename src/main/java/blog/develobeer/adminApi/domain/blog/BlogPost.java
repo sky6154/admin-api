@@ -14,6 +14,8 @@ import java.sql.Timestamp;
 @Entity
 @Table(name="blog_post")
 public class BlogPost implements Serializable {
+    private static final long serialVersionUID = 1254837323714973222L;
+
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer seq;

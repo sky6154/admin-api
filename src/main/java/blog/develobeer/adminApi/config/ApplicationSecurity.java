@@ -1,6 +1,9 @@
 package blog.develobeer.adminApi.config;
 
-import blog.develobeer.adminApi.filter.*;
+import blog.develobeer.adminApi.filter.CustomTokenAuthenticationFilter;
+import blog.develobeer.adminApi.filter.DevelobeerCsrfTokenRepo;
+import blog.develobeer.adminApi.filter.MyLogoutSuccessHandler;
+import blog.develobeer.adminApi.filter.RestAuthenticationEntryPoint;
 import blog.develobeer.adminApi.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -14,8 +17,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.csrf.CsrfFilter;
-import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
@@ -48,6 +49,7 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
         http
                 .httpBasic().disable()
                 .sessionManagement()
+                .sessionFixation().migrateSession()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .addFilterBefore(customTokenAuthenticationFilter(AUTHENTICATION_REQUIRED_PATTERN), UsernamePasswordAuthenticationFilter.class)

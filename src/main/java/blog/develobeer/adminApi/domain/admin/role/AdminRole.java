@@ -15,6 +15,8 @@ import java.sql.Timestamp;
 @Table(name="user_role")
 @ToString
 public class AdminRole implements Serializable {
+    private static final long serialVersionUID = -4245799947333023767L;
+
     @EmbeddedId
     private AdminRoleId adminRoleId;
 

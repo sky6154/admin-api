@@ -16,6 +16,8 @@ import java.sql.Timestamp;
 @Entity
 @Table(name="blog_board")
 public class BlogBoard implements Serializable {
+    private static final long serialVersionUID = -5208624951912909252L;
+
     @Id
     @Column(name="board_id")
     private Integer boardId;
