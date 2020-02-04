@@ -42,7 +42,7 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public static String[] AUTHENTICATION_REQUIRED_PATTERN = {"/admin/**", "/post/**", "/board/**", "/getAuthorities"};
+    private static String[] AUTHENTICATION_REQUIRED_PATTERN = {"/admin/**", "/post/**", "/board/**", "/getAuthorities"};
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -76,7 +76,7 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
         return new CustomTokenAuthenticationFilter(getRequiredAuthPath(patterns), this.authenticationManagerBean());
     }
 
-    public OrRequestMatcher getRequiredAuthPath(String[] patterns) {
+    private OrRequestMatcher getRequiredAuthPath(String[] patterns) {
         List<RequestMatcher> requestMatchers = new ArrayList<>();
 
         for (String pattern : patterns) {

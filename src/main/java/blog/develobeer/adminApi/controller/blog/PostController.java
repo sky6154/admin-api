@@ -2,6 +2,7 @@ package blog.develobeer.adminApi.controller.blog;
 
 import blog.develobeer.adminApi.domain.blog.BlogPost;
 import blog.develobeer.adminApi.service.PostService;
+import blog.develobeer.adminApi.utils.CompressUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +34,9 @@ public class PostController {
         }
 
         for(int index = 0; index < files.length; index++){
-            result.add(postService.uploadFile(boardId, index, files[index]));
+            MultipartFile compressedImage = CompressUtil.compressImage(files[index]);
+
+            result.add(postService.uploadFile(boardId, index, compressedImage));
         }
 
         return ResponseEntity.ok(result);

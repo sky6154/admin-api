@@ -76,6 +76,8 @@ dependencies {
     compile("com.querydsl:querydsl-apt")
 
     compile group: 'org.xmlbeam', name: 'xmlprojector', version: '1.4.16'
+
+    compile('org.apache.commons:commons-exec:1.3')
 }
 
 wrapper {
