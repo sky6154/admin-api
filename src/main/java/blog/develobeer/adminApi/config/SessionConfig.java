@@ -13,6 +13,7 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.session.data.redis.config.ConfigureRedisAction;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 import org.springframework.session.web.http.CookieHttpSessionIdResolver;
@@ -42,9 +43,7 @@ public class SessionConfig {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(redisHost, redisPort);
 
         if(Arrays.asList(env.getActiveProfiles()).contains("test")){
-            String redisPassword = env.getProperty("spring.redis.password");
-
-            redisStandaloneConfiguration.setPassword(redisPassword);
+            redisStandaloneConfiguration.setPassword(env.getProperty("spring.redis.password"));
         }
 
         return new LettuceConnectionFactory(redisStandaloneConfiguration);
@@ -71,8 +70,22 @@ public class SessionConfig {
         CookieHttpSessionIdResolver resolver = new CookieHttpSessionIdResolver();
         DefaultCookieSerializer cookieSerializer = new DefaultCookieSerializer();
         cookieSerializer.setUseBase64Encoding(false);
+        cookieSerializer.setCookieName("DEVELOBEER-SESSION");
+        cookieSerializer.setUseHttpOnlyCookie(true);
+        cookieSerializer.setUseSecureCookie(true);
+
+        if(Arrays.asList(env.getActiveProfiles()).contains("test")){
+            cookieSerializer.setUseSecureCookie(false);
+        }
+
+
         resolver.setCookieSerializer(cookieSerializer);
         return resolver;
+    }
+
+    @Bean
+    public HttpSessionEventPublisher httpSessionEventPublisher() {
+        return new HttpSessionEventPublisher();
     }
 
     @Bean

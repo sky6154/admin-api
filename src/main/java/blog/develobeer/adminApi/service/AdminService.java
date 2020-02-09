@@ -4,6 +4,7 @@ import blog.develobeer.adminApi.dao.admin.role.AdminRoleRepository;
 import blog.develobeer.adminApi.dao.admin.user.AdminRepository;
 import blog.develobeer.adminApi.domain.admin.role.AdminRole;
 import blog.develobeer.adminApi.domain.admin.user.Admin;
+import blog.develobeer.adminApi.domain.admin.user.AdminDetails;
 import blog.develobeer.adminApi.utils.AdminContext;
 import blog.develobeer.adminApi.utils.CommonTemplateMethod;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +16,15 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class AdminService implements UserDetailsService {
+public class AdminService implements UserDetailsService, Serializable {
+    private static final long serialVersionUID = -7643057474949440931L;
 
     private final AdminRepository adminRepository;
     private final AdminRoleRepository adminRoleRepository;
@@ -42,49 +45,24 @@ public class AdminService implements UserDetailsService {
 
         optionalAdmin.orElseThrow(() -> new UsernameNotFoundException("Admin not found."));
 
-        return optionalAdmin
-                .map(admin -> new UserDetails() {
-                    @Override
-                    public Collection<? extends GrantedAuthority> getAuthorities() {
-                        List<AdminRole> adminRoles = adminRoleRepository.getAdminRolesByUserId(admin.getId());
+        return optionalAdmin.map(admin -> {
+            List<AdminRole> adminRoles = adminRoleRepository.getAdminRolesByUserId(admin.getId());
 
-                        return adminRoles
-                                .stream()
-                                .map(adminRole -> new SimpleGrantedAuthority("ROLE_" + adminRole.getRole()))
-                                .collect(Collectors.toList());
-                    }
+            Collection<? extends GrantedAuthority> authorities = adminRoles
+                    .stream()
+                    .map(adminRole -> new SimpleGrantedAuthority("ROLE_" + adminRole.getRole()))
+                    .collect(Collectors.toList());
 
-                    @Override
-                    public String getPassword() {
-                        return admin.getPwd();
-                    }
-
-                    @Override
-                    public String getUsername() {
-                        return admin.getId();
-                    }
-
-                    @Override
-                    public boolean isAccountNonExpired() {
-                        return true;
-                    }
-
-                    @Override
-                    public boolean isAccountNonLocked() {
-                        return true;
-                    }
-
-                    @Override
-                    public boolean isCredentialsNonExpired() {
-                        return true;
-                    }
-
-                    @Override
-                    public boolean isEnabled() {
-                        return true;
-                    }
-                })
-                .get();
+            return AdminDetails.builder()
+                    .authorities(authorities)
+                    .password(admin.getPwd())
+                    .username(admin.getId())
+                    .isAccountNonExpired(true)
+                    .isAccountNonLocked(true)
+                    .isCredentialsNonExpired(true)
+                    .isEnabled(true)
+                    .build();
+        }).get();
     }
 
     public boolean isExist(String adminId) {
@@ -102,22 +80,21 @@ public class AdminService implements UserDetailsService {
         return CommonTemplateMethod.simpleSaveTryCatchBooleanReturn(adminRoleRepository, adminRoleList);
     }
 
-    public List<Admin> getAllAdminList(){
+    public List<Admin> getAllAdminList() {
         return adminRepository.getAdminList();
     }
 
-    public boolean changePassword(String newPassword){
+    public boolean changePassword(String newPassword) {
         Optional<Admin> optionalAdmin = adminRepository.findById(AdminContext.getAdminName());
 
-        if(optionalAdmin.isPresent()){
+        if (optionalAdmin.isPresent()) {
             Admin admin = optionalAdmin.get();
 
             admin.setPwd(passwordEncoder.encode(newPassword));
             adminRepository.save(admin);
 
             return true;
-        }
-        else{
+        } else {
             throw new UsernameNotFoundException("Invalid admin : " + AdminContext.getAdminName());
         }
     }

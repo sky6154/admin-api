@@ -9,8 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.CredentialsExpiredException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.session.FindByIndexNameSessionRepository;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,13 +29,15 @@ import java.util.Collection;
 public class BasicController {
 
     private final TokenService tokenService;
+    private final AuthenticationManager authenticationManager;
 
     @Autowired
     Environment env;
 
     @Autowired
-    public BasicController(TokenService tokenService){
+    public BasicController(TokenService tokenService, AuthenticationManager authenticationManager){
         this.tokenService = tokenService;
+        this.authenticationManager = authenticationManager;
     }
 
     @GetMapping("/")
@@ -40,29 +47,57 @@ public class BasicController {
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseEntity login(@RequestBody AuthenticationRequest authenticationRequest, HttpServletResponse response, HttpSession session) {
-        if(tokenService.login(authenticationRequest)){
-            session.setAttribute(FindByIndexNameSessionRepository.PRINCIPAL_NAME_INDEX_NAME, authenticationRequest.getUsername());
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword());
 
-            String token = DevelobeerAuthenticationToken.encode(authenticationRequest.getUsername(), session.getId());
+        try {
+            Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
             Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 
-            Cookie authToken = new Cookie(CustomTokenAuthenticationFilter.CUSTOM_TOKEN_HEADER, token);
-            authToken.setHttpOnly(true);
-            authToken.setSecure(true); // default
+            System.out.println("##########");
+            System.out.println(session.getId());
 
-            for(String activeProfile : env.getActiveProfiles()){
-                if(activeProfile.contains("test")){
-                    authToken.setSecure(false); // for test env
-                }
-            }
+            session.setAttribute(FindByIndexNameSessionRepository.PRINCIPAL_NAME_INDEX_NAME, authenticationRequest.getUsername());
+//            session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
 
-            response.addCookie(authToken);
+            System.out.println("###");
+            System.out.println(SecurityContextHolder.getContext().getAuthentication().getName());
+            System.out.println(SecurityContextHolder.getContext().getAuthentication().isAuthenticated());
 
             return ResponseEntity.ok(new AuthenticationToken(authenticationRequest.getUsername(), authorities));
         }
-        else{
+        catch(Exception e){
+            e.printStackTrace();
             return ResponseEntity.badRequest().build();
         }
+
+
+//        if(tokenService.login(authenticationRequest)){
+//            session.setAttribute(FindByIndexNameSessionRepository.PRINCIPAL_NAME_INDEX_NAME, authenticationRequest.getUsername());
+//
+////            String token = DevelobeerAuthenticationToken.encode(authenticationRequest.getUsername(), session.getId());
+//            Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+////
+////            Cookie authToken = new Cookie(CustomTokenAuthenticationFilter.CUSTOM_TOKEN_HEADER, token);
+////            authToken.setHttpOnly(true);
+////            authToken.setSecure(true); // default
+////
+////            for(String activeProfile : env.getActiveProfiles()){
+////                if(activeProfile.contains("test")){
+////                    authToken.setSecure(false); // for test env
+////                }
+////            }
+////
+////            response.addCookie(authToken);
+//
+//
+//
+//            return ResponseEntity.ok(new AuthenticationToken(authenticationRequest.getUsername(), authorities));
+//        }
+//        else{
+//            return ResponseEntity.badRequest().build();
+//        }
     }
 
     @RequestMapping(value = "/getAuthorities", method = RequestMethod.GET)

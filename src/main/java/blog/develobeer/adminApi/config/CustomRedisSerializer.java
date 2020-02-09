@@ -33,7 +33,7 @@ public class CustomRedisSerializer implements RedisSerializer<Object> {
         try {
             return serializer.convert(object);
         } catch (Exception ex) {
-            return EMPTY_ARRAY;
+            throw new SerializationException("Cannot serialize", ex);
         }
     }
 

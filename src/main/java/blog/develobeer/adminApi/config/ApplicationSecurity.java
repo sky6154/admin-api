@@ -1,9 +1,6 @@
 package blog.develobeer.adminApi.config;
 
-import blog.develobeer.adminApi.filter.CustomTokenAuthenticationFilter;
-import blog.develobeer.adminApi.filter.DevelobeerCsrfTokenRepo;
-import blog.develobeer.adminApi.filter.MyLogoutSuccessHandler;
-import blog.develobeer.adminApi.filter.RestAuthenticationEntryPoint;
+import blog.develobeer.adminApi.filter.*;
 import blog.develobeer.adminApi.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -49,10 +46,14 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
         http
                 .httpBasic().disable()
                 .sessionManagement()
-                .sessionFixation().migrateSession()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+//                .sessionAuthenticationStrategy(new SessionStrategy())
+                .enableSessionUrlRewriting(false)
+                .maximumSessions(1)
                 .and()
-                .addFilterBefore(customTokenAuthenticationFilter(AUTHENTICATION_REQUIRED_PATTERN), UsernamePasswordAuthenticationFilter.class)
+                .sessionFixation().changeSessionId()
+                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                .and()
+//                .addFilterBefore(customTokenAuthenticationFilter(AUTHENTICATION_REQUIRED_PATTERN), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .antMatchers("/", "/login", "/logout", "/error").permitAll()
@@ -81,7 +82,6 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
 
         for (String pattern : patterns) {
             RequestMatcher requestMatcher = new AntPathRequestMatcher(pattern);
-
             requestMatchers.add(requestMatcher);
         }
 
@@ -101,8 +101,6 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
 
     @Bean
     public HttpSessionCsrfTokenRepository getCsrfTokenRepo(){
-        DevelobeerCsrfTokenRepo develobeerCsrfTokenRepo = new DevelobeerCsrfTokenRepo();
-
-        return develobeerCsrfTokenRepo.getCsrfTokenRepo();
+        return new DevelobeerCsrfTokenRepo().getCsrfTokenRepo();
     }
 }
