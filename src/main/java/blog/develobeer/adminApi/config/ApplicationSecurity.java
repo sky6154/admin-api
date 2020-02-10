@@ -50,6 +50,8 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
                 .enableSessionUrlRewriting(false)
                 .maximumSessions(1)
                 .maxSessionsPreventsLogin(true)
+                // TODO
+//                .sessionRegistry() // 이걸 등록해야 할듯 ?
                 .and()
                 .sessionFixation().changeSessionId()
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
