@@ -49,6 +49,7 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
 //                .sessionAuthenticationStrategy(new SessionStrategy())
                 .enableSessionUrlRewriting(false)
                 .maximumSessions(1)
+                .maxSessionsPreventsLogin(true)
                 .and()
                 .sessionFixation().changeSessionId()
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)

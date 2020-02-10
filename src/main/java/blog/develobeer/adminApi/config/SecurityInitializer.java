@@ -6,4 +6,9 @@ public class SecurityInitializer extends AbstractSecurityWebApplicationInitializ
     public SecurityInitializer() {
         super(ApplicationSecurity.class, SessionConfig.class);
     }
+
+    @Override
+    protected boolean enableHttpSessionEventPublisher(){
+        return true;
+    }
 }

@@ -42,27 +42,25 @@ public class AdminService implements UserDetailsService, Serializable {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<Admin> optionalAdmin = adminRepository.findById(username);
-
         optionalAdmin.orElseThrow(() -> new UsernameNotFoundException("Admin not found."));
 
-        return optionalAdmin.map(admin -> {
-            List<AdminRole> adminRoles = adminRoleRepository.getAdminRolesByUserId(admin.getId());
+        Admin admin = optionalAdmin.get();
+        List<AdminRole> adminRoles = adminRoleRepository.getAdminRolesByUserId(admin.getId());
 
-            Collection<? extends GrantedAuthority> authorities = adminRoles
-                    .stream()
-                    .map(adminRole -> new SimpleGrantedAuthority("ROLE_" + adminRole.getRole()))
-                    .collect(Collectors.toList());
+        Collection<? extends GrantedAuthority> authorities = adminRoles
+                .stream()
+                .map(adminRole -> new SimpleGrantedAuthority("ROLE_" + adminRole.getRole()))
+                .collect(Collectors.toList());
 
-            return AdminDetails.builder()
-                    .authorities(authorities)
-                    .password(admin.getPwd())
-                    .username(admin.getId())
-                    .isAccountNonExpired(true)
-                    .isAccountNonLocked(true)
-                    .isCredentialsNonExpired(true)
-                    .isEnabled(true)
-                    .build();
-        }).get();
+        return AdminDetails.builder()
+                .authorities(authorities)
+                .password(admin.getPwd())
+                .username(admin.getId())
+                .isAccountNonExpired(true)
+                .isAccountNonLocked(true)
+                .isCredentialsNonExpired(true)
+                .isEnabled(true)
+                .build();
     }
 
     public boolean isExist(String adminId) {

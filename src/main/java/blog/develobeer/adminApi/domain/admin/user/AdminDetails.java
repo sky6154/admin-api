@@ -1,7 +1,6 @@
 package blog.develobeer.adminApi.domain.admin.user;
 
 import lombok.Builder;
-import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -19,6 +18,20 @@ public class AdminDetails implements UserDetails, Serializable {
     private boolean isAccountNonLocked;
     private boolean isCredentialsNonExpired;
     private boolean isEnabled;
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof AdminDetails) {
+            return username.equals( ((AdminDetails) obj).getUsername() );
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return username != null ? username.hashCode() : 0;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
