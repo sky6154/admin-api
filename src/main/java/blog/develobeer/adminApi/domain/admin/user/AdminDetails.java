@@ -21,8 +21,8 @@ public class AdminDetails implements UserDetails, Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof AdminDetails) {
-            return username.equals( ((AdminDetails) obj).getUsername() );
+        if (obj instanceof UserDetails) {
+            return username.equals( ((UserDetails) obj).getUsername() );
         }
 
         return false;

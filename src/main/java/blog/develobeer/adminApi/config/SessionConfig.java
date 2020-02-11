@@ -23,6 +23,7 @@ import org.springframework.session.web.http.HttpSessionIdResolver;
 import java.util.Arrays;
 
 @Configuration
+//@EnableRedisRepositories
 @EnableRedisHttpSession
 public class SessionConfig {
     @Value("${spring.redis.host}")
@@ -33,9 +34,11 @@ public class SessionConfig {
 
     private final Environment env;
 
+
     @Autowired
-    SessionConfig(Environment env){
+    public SessionConfig(Environment env){
         this.env = env;
+//        this.sessionRepository = sessionRepository;
     }
 
     @Bean
@@ -78,7 +81,6 @@ public class SessionConfig {
             cookieSerializer.setUseSecureCookie(false);
         }
 
-
         resolver.setCookieSerializer(cookieSerializer);
         return resolver;
     }
@@ -89,12 +91,12 @@ public class SessionConfig {
     }
 
     @Bean
-    public PasswordEncoder getPasswordEncoder(){
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    public ConfigureRedisAction configureRedisAction() {
+        return ConfigureRedisAction.NO_OP;
     }
 
     @Bean
-    public ConfigureRedisAction configureRedisAction() {
-        return ConfigureRedisAction.NO_OP;
+    public PasswordEncoder getPasswordEncoder(){
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 }

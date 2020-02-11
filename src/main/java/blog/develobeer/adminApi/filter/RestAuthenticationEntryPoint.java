@@ -13,12 +13,11 @@ import java.io.IOException;
 
 @Component
 public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
-    protected final Log logger = LogFactory.getLog(this.getClass());
+    private final Log logger = LogFactory.getLog(this.getClass());
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException authException ) throws IOException, ServletException {
-
         logger.info(authException.getMessage());
 
         response.sendError( HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized" );

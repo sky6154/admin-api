@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 
 @Service
+@Deprecated
 public class TokenService {
     private final FindByIndexNameSessionRepository sessionRepository;
     private final AuthenticationManager authenticationManager;

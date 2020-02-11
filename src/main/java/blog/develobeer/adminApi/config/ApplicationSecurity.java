@@ -2,6 +2,7 @@ package blog.develobeer.adminApi.config;
 
 import blog.develobeer.adminApi.filter.*;
 import blog.develobeer.adminApi.service.AdminService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,10 +15,13 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.session.FindByIndexNameSessionRepository;
+import org.springframework.session.security.SpringSessionBackedSessionRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,14 +33,20 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
     private final AdminService adminService;
     private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
     private final PasswordEncoder passwordEncoder;
+    private final FindByIndexNameSessionRepository sessionRepository;
+    private final ObjectMapper objectMapper;
 
     @Autowired
     public ApplicationSecurity(AdminService adminService,
                                RestAuthenticationEntryPoint restAuthenticationEntryPoint,
-                               PasswordEncoder passwordEncoder) {
+                               PasswordEncoder passwordEncoder,
+                               FindByIndexNameSessionRepository sessionRepository,
+                               ObjectMapper objectMapper) {
         this.adminService = adminService;
         this.restAuthenticationEntryPoint = restAuthenticationEntryPoint;
         this.passwordEncoder = passwordEncoder;
+        this.sessionRepository = sessionRepository;
+        this.objectMapper = objectMapper;
     }
 
     private static String[] AUTHENTICATION_REQUIRED_PATTERN = {"/admin/**", "/post/**", "/board/**", "/getAuthorities"};
@@ -44,40 +54,54 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .httpBasic().disable()
+                .httpBasic()
+                    .disable()
+                .csrf()
+                    .csrfTokenRepository(getCsrfTokenRepo()).ignoringAntMatchers("/", "/login", "/error")
+                .and()
                 .sessionManagement()
-//                .sessionAuthenticationStrategy(new SessionStrategy())
-                .enableSessionUrlRewriting(false)
-                .maximumSessions(1)
-                .maxSessionsPreventsLogin(true)
-                // TODO
-//                .sessionRegistry() // 이걸 등록해야 할듯 ?
+                    .enableSessionUrlRewriting(false)
+                    .maximumSessions(1)
+                    .maxSessionsPreventsLogin(false)
+                    .sessionRegistry(this.sessionRegistry())
+                    .expiredSessionStrategy(new RestSessionExpiredStrategy())
                 .and()
-                .sessionFixation().changeSessionId()
-                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                    .sessionFixation().changeSessionId()
+                    .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 .and()
-//                .addFilterBefore(customTokenAuthenticationFilter(AUTHENTICATION_REQUIRED_PATTERN), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAt(this.restUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .antMatchers("/", "/login", "/logout", "/error").permitAll()
-                .antMatchers("/getAuthorities").hasAnyAuthority("ROLE_BLOG", "ROLE_ADMIN", "ROLE_ETC")
-                .antMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
-                .antMatchers("/post/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_BLOG")
-                .antMatchers("/board/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_BLOG")
-                .anyRequest().authenticated()
+                    .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                    .antMatchers("/", "/login", "/logout", "/error").permitAll()
+                    .antMatchers("/getAuthorities").hasAnyAuthority("ROLE_BLOG", "ROLE_ADMIN", "ROLE_ETC")
+                    .antMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
+                    .antMatchers("/post/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_BLOG")
+                    .antMatchers("/board/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_BLOG")
+                    .anyRequest().authenticated()
                 .and()
-                .csrf().csrfTokenRepository(getCsrfTokenRepo()).ignoringAntMatchers("/", "/login", "/error")
-                .and()
-                .exceptionHandling()
-                .authenticationEntryPoint(restAuthenticationEntryPoint)
+                    .exceptionHandling()
+                    .authenticationEntryPoint(restAuthenticationEntryPoint)
                 .and()
                 .logout()
-                .logoutUrl("/logout")
-                .logoutSuccessHandler(new MyLogoutSuccessHandler());
+                    .logoutUrl("/logout")
+                    .deleteCookies("DEVELOBEER-SESSION")
+                    .invalidateHttpSession(true)
+                    .logoutSuccessHandler(new RestLogoutSuccessHandler());
     }
 
-    private CustomTokenAuthenticationFilter customTokenAuthenticationFilter(String[] patterns) throws Exception {
-        return new CustomTokenAuthenticationFilter(getRequiredAuthPath(patterns), this.authenticationManagerBean());
+    private RestUsernamePasswordAuthenticationFilter restUsernamePasswordAuthenticationFilter(){
+        RestUsernamePasswordAuthenticationFilter filter = new RestUsernamePasswordAuthenticationFilter(this.objectMapper);
+        filter.setPostOnly(true);
+        filter.setSessionAuthenticationStrategy(this.authStrategy());
+        filter.setAuthenticationSuccessHandler(new RestLoginSuccessHandler(objectMapper));
+        filter.setAuthenticationManager(this.authenticationManagerBean());
+
+        return filter;
+    }
+
+    @Bean
+    public SpringSessionBackedSessionRegistry sessionRegistry() {
+        return new SpringSessionBackedSessionRegistry<>(this.sessionRepository);
     }
 
     private OrRequestMatcher getRequiredAuthPath(String[] patterns) {
@@ -93,17 +117,32 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(adminService).passwordEncoder(passwordEncoder);
+        auth.userDetailsService(adminService).passwordEncoder(this.passwordEncoder);
     }
 
     @Bean
     @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
+    public AuthenticationManager authenticationManagerBean() {
+        try{
+            return super.authenticationManagerBean();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Bean
     public HttpSessionCsrfTokenRepository getCsrfTokenRepo(){
         return new DevelobeerCsrfTokenRepo().getCsrfTokenRepo();
+    }
+
+    @Bean
+    public ConcurrentSessionControlAuthenticationStrategy authStrategy(){
+        ConcurrentSessionControlAuthenticationStrategy strategy = new ConcurrentSessionControlAuthenticationStrategy(this.sessionRegistry());
+        strategy.setExceptionIfMaximumExceeded(false);
+        strategy.setMaximumSessions(1);
+
+        return strategy;
     }
 }
