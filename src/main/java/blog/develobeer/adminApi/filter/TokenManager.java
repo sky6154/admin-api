@@ -13,6 +13,7 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
 @Component
+@Deprecated
 public class TokenManager {
     private static PrivateKey privateKey;
     private static PublicKey publicKey;

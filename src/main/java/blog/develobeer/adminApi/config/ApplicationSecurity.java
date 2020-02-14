@@ -57,7 +57,7 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
                 .httpBasic()
                     .disable()
                 .csrf()
-                    .csrfTokenRepository(getCsrfTokenRepo()).ignoringAntMatchers("/", "/login", "/error")
+                    .csrfTokenRepository(getCsrfTokenRepo())
                 .and()
                 .sessionManagement()
                     .enableSessionUrlRewriting(false)
@@ -94,6 +94,7 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
         filter.setPostOnly(true);
         filter.setSessionAuthenticationStrategy(this.authStrategy());
         filter.setAuthenticationSuccessHandler(new RestLoginSuccessHandler(objectMapper));
+        filter.setAuthenticationFailureHandler(new RestLoginFailureHandler());
         filter.setAuthenticationManager(this.authenticationManagerBean());
 
         return filter;

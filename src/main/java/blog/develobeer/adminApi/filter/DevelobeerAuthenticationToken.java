@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.security.Principal;
 import java.util.Collection;
 
+@Deprecated
 public class DevelobeerAuthenticationToken extends AbstractAuthenticationToken {
     private static final long serialVersionUID = 1L;
     private final Object principal;
