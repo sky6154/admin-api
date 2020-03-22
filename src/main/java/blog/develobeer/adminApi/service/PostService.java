@@ -68,9 +68,6 @@ public class PostService {
             String SAVE_LOCATION = SAVE_ROOT + BOARD_FOLDER;
             String REF_LOCATION = ACCESS_ADDR + BOARD_FOLDER;
 
-            System.out.println("####");
-            System.out.println(SAVE_LOCATION);
-
             // 경로(폴더)가 없을 경우 생성
             if (Files.notExists(Paths.get(SAVE_LOCATION))) {
                 Files.createDirectories(Paths.get(SAVE_LOCATION)); // 하위 디렉토리까지 모두 생성
