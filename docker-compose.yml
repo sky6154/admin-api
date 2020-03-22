@@ -10,7 +10,7 @@ services:
     container_name: myBlogAdminAPI
 
     volumes:
-      - /static:/var/www
+      - /static:~/www
 
     deploy:
       resources:

@@ -6,9 +6,9 @@ import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 public class DevelobeerCsrfTokenRepo {
 
     private final HttpSessionCsrfTokenRepository httpSessionCsrfTokenRepository;
-    private static String CSRF_SESSION_HEADER = "DEVELOBEER-CSRF";
-    private static String CSRF_SESSION_PARAM = "DEVELOBEER-CSRF-PARAM";
-    private static String CSRF_SESSION_ATTR = "DEVELOBEER-CSRF-TOKEN";
+    public static String CSRF_SESSION_HEADER = "DEVELOBEER-CSRF";
+    public static String CSRF_SESSION_PARAM = "DEVELOBEER-CSRF-PARAM";
+    public static String CSRF_SESSION_ATTR = "DEVELOBEER-CSRF-TOKEN";
 
     public DevelobeerCsrfTokenRepo(){
         this.httpSessionCsrfTokenRepository = new HttpSessionCsrfTokenRepository();

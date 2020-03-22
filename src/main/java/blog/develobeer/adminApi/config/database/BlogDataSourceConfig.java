@@ -1,5 +1,6 @@
 package blog.develobeer.adminApi.config.database;
 
+import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -38,10 +39,16 @@ public class BlogDataSourceConfig implements Serializable {
     }
 
     @Primary
-    @Bean(name = "dataSource")
+    @Bean(name = "blogHikariConfig")
     @ConfigurationProperties(prefix = "spring.datasource.blog")
-    public DataSource dataSource() {
-        return DataSourceBuilder.create().type(HikariDataSource.class).build();
+    public HikariConfig hikariConfig() {
+        return new HikariConfig();
+    }
+
+    @Primary
+    @Bean(name = "dataSource")
+    public DataSource dataSource(@Qualifier("blogHikariConfig") HikariConfig blogHikariConfig) {
+        return new HikariDataSource(blogHikariConfig);
     }
 
     @Primary

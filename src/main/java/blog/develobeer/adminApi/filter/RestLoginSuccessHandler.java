@@ -6,13 +6,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.csrf.CsrfToken;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Enumeration;
+import java.util.List;
 
 public class RestLoginSuccessHandler implements AuthenticationSuccessHandler {
 
@@ -23,10 +27,12 @@ public class RestLoginSuccessHandler implements AuthenticationSuccessHandler {
     }
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        CsrfToken csrfToken = (CsrfToken) request.getSession().getAttribute(DevelobeerCsrfTokenRepo.CSRF_SESSION_ATTR);
+
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        String json = mapper.writeValueAsString(new AuthenticationToken(username, authorities));
+        String json = mapper.writeValueAsString(new AuthenticationToken(username, authorities, csrfToken.getHeaderName(), csrfToken.getToken()));
 
         response.setStatus(HttpStatus.OK.value());
         response.getWriter().write(json);

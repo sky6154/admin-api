@@ -5,37 +5,38 @@ import blog.develobeer.adminApi.domain.blog.BlogPost;
 import blog.develobeer.adminApi.utils.AdminContext;
 import blog.develobeer.adminApi.utils.CommonTemplateMethod;
 import blog.develobeer.adminApi.utils.SimpleAES256;
+import org.apache.catalina.core.ApplicationContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.NoResultException;
+import javax.servlet.ServletContext;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class PostService {
 
     private final BlogPostRepository blogPostRepository;
 
-    @Value("${path.upload-root}")
-    private String UPLOAD_ROOT;
     @Value("${path.access-addr}")
     private String ACCESS_ADDR;
 
     @Value("${secure.image.iteration-count}")
     private int ITERATION_COUNT;
     @Value("${secure.image.key}")
-    private static String KEY;
+    private String KEY;
+
+    @Autowired
+    Environment env;
 
     private static final String BOARD_FOLDER = "board/";
     private static final String FILE_SEPARATOR = "_";
@@ -51,9 +52,28 @@ public class PostService {
         if (file == null) {
             throw new IOException("File not exist.");
         } else {
+            String SAVE_ROOT;
+
+            if(Arrays.asList(env.getActiveProfiles()).contains("test")){
+                SAVE_ROOT = "src/main/resources/";
+            }
+            else{
+                SAVE_ROOT = System.getProperty("user.home");
+            }
+
+            if(!SAVE_ROOT.endsWith("/")){
+                SAVE_ROOT = SAVE_ROOT + "/";
+            }
+
+            String SAVE_LOCATION = SAVE_ROOT + BOARD_FOLDER;
+            String REF_LOCATION = ACCESS_ADDR + BOARD_FOLDER;
+
+            System.out.println("####");
+            System.out.println(SAVE_LOCATION);
+
             // 경로(폴더)가 없을 경우 생성
-            if (Files.notExists(Paths.get(UPLOAD_ROOT + BOARD_FOLDER))) {
-                Files.createDirectory(Paths.get(UPLOAD_ROOT + BOARD_FOLDER));
+            if (Files.notExists(Paths.get(SAVE_LOCATION))) {
+                Files.createDirectories(Paths.get(SAVE_LOCATION)); // 하위 디렉토리까지 모두 생성
             }
 
             byte[] bytes = file.getBytes();
@@ -75,7 +95,7 @@ public class PostService {
 
             fileName = baseFileName + "." + extension;
 
-            Path path = Paths.get(UPLOAD_ROOT + BOARD_FOLDER + fileName);
+            Path path = Paths.get(SAVE_LOCATION + fileName);
 
             // 파일 이름이 겹칠 경우 괄호안에 카운팅을 하여 저장한다.
             while (Files.exists(path)) {
@@ -85,14 +105,14 @@ public class PostService {
                     fileName = baseFileName + " (" + counter + ")." + extension;
                 }
 
-                path = Paths.get(UPLOAD_ROOT + BOARD_FOLDER + fileName);
+                path = Paths.get(SAVE_LOCATION + fileName);
                 counter++;
             }
 
             Files.write(path, bytes);
 
             result.put("fileName", fileName);
-            result.put("path", ACCESS_ADDR + BOARD_FOLDER);
+            result.put("path", REF_LOCATION);
 
             return result;
         }

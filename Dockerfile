@@ -4,7 +4,7 @@ MAINTAINER kokj <sky6154@gmail.com>
 VOLUME /tmp
 COPY /build/libs/develobeer-admin-latest.jar develobeer-admin.jar
 
-RUN mkdir -p /var/www
+RUN mkdir -p ~/www
 
 EXPOSE 8080
 

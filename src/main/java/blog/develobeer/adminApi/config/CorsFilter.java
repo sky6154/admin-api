@@ -1,5 +1,6 @@
 package blog.develobeer.adminApi.config;
 
+import blog.develobeer.adminApi.filter.DevelobeerCsrfTokenRepo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -28,7 +29,7 @@ public class CorsFilter implements Filter {
         }
 
         response.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, OPTIONS, DELETE, PATCH");
-        response.setHeader("Access-Control-Allow-Headers", "Content-Type, DEVELOBEER-CSRF");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type" + ", " + DevelobeerCsrfTokenRepo.CSRF_SESSION_HEADER);
         response.setHeader("Access-Control-Allow-Credentials", "true");
 
         chain.doFilter(req, res);

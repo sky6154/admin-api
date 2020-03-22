@@ -1,5 +1,6 @@
 package blog.develobeer.adminApi.config.database;
 
+import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -7,6 +8,7 @@ import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -37,10 +39,15 @@ public class AdminDataSourceConfig implements Serializable {
         return props;
     }
 
-    @Bean(name = "adminDataSource")
+    @Bean(name = "adminHikariConfig")
     @ConfigurationProperties(prefix = "spring.datasource.admin")
-    public DataSource adminDataSource() {
-        return DataSourceBuilder.create().type(HikariDataSource.class).build();
+    public HikariConfig adminHikariConfig() {
+        return new HikariConfig();
+    }
+
+    @Bean(name = "adminDataSource")
+    public DataSource adminDataSource(@Qualifier("adminHikariConfig") HikariConfig adminHikariConfig) {
+        return new HikariDataSource(adminHikariConfig);
     }
 
     @Bean(name = "adminEntityManagerFactory")

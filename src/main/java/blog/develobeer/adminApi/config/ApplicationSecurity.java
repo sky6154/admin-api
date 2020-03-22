@@ -57,7 +57,7 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
                 .httpBasic()
                     .disable()
                 .csrf()
-                    .csrfTokenRepository(getCsrfTokenRepo())
+                    .csrfTokenRepository(getCsrfTokenRepo()).ignoringAntMatchers("/login")
                 .and()
                 .sessionManagement()
                     .enableSessionUrlRewriting(false)
@@ -141,7 +141,6 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
     @Bean
     public ConcurrentSessionControlAuthenticationStrategy authStrategy(){
         ConcurrentSessionControlAuthenticationStrategy strategy = new ConcurrentSessionControlAuthenticationStrategy(this.sessionRegistry());
-        strategy.setExceptionIfMaximumExceeded(false);
         strategy.setMaximumSessions(1);
 
         return strategy;

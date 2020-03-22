@@ -30,3 +30,6 @@ src/main/resources/application.yml
 
 ### querydsl ###
 src/main/generated/
+
+### dev test image upload location ###
+src/main/resources/board/

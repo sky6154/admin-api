@@ -29,13 +29,12 @@ public class PostController {
     public ResponseEntity uploadFile(MultipartFile[] files, @PathVariable Integer boardId) throws Exception {
         List<Map<String, String>> result = new ArrayList<>();
 
-        if(files == null || files.length < 1){
+        if(boardId == null || files == null || files.length < 1){
             return ResponseEntity.badRequest().build();
         }
 
         for(int index = 0; index < files.length; index++){
             MultipartFile compressedImage = CompressUtil.compressImage(files[index]);
-
             result.add(postService.uploadFile(boardId, index, compressedImage));
         }
 
