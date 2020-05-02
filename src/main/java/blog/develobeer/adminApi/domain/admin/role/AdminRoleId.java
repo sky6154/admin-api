@@ -17,9 +17,9 @@ import java.io.Serializable;
 public class AdminRoleId implements Serializable {
     private static final long serialVersionUID = -2844093315347520593L;
 
-    @Column(name="user_seq")
+    @Column(name = "user_seq")
     private Integer userSeq;
 
-    @Column(name="role_id")
+    @Column(name = "role_id")
     private Integer roleId;
 }

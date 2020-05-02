@@ -10,7 +10,7 @@ public class RestUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
 
     private final ObjectMapper objectMapper;
 
-    public RestUsernamePasswordAuthenticationFilter(ObjectMapper objectMapper){
+    public RestUsernamePasswordAuthenticationFilter(ObjectMapper objectMapper) {
         super();
         this.objectMapper = objectMapper;
     }
@@ -25,16 +25,15 @@ public class RestUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
         return handleObtainLoginRequest(request).getPassword();
     }
 
-    private AuthenticationRequest handleObtainLoginRequest(HttpServletRequest request){
+    private AuthenticationRequest handleObtainLoginRequest(HttpServletRequest request) {
         AuthenticationRequest authenticationRequest = (AuthenticationRequest) request.getAttribute(AuthenticationRequest.class.getName());
 
-        if(authenticationRequest == null){
-            try{
+        if (authenticationRequest == null) {
+            try {
                 authenticationRequest = this.objectMapper.readValue(request.getReader(), AuthenticationRequest.class);
                 // 최초 readValue 후 stream이 closed 되어 username 읽고, password읽을 때 exception이 발생하므로 request에 객체로 저장한다.
                 request.setAttribute(AuthenticationRequest.class.getName(), authenticationRequest);
-            }
-            catch(Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
                 authenticationRequest = new AuthenticationRequest();
                 authenticationRequest.setUsername("");

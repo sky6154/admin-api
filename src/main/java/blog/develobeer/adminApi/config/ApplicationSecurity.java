@@ -55,41 +55,41 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .httpBasic()
-                    .disable()
+                .disable()
                 .csrf()
-                    .csrfTokenRepository(getCsrfTokenRepo()).ignoringAntMatchers("/login")
+                .csrfTokenRepository(getCsrfTokenRepo()).ignoringAntMatchers("/login")
                 .and()
                 .sessionManagement()
-                    .enableSessionUrlRewriting(false)
-                    .maximumSessions(1)
-                    .maxSessionsPreventsLogin(false)
-                    .sessionRegistry(this.sessionRegistry())
-                    .expiredSessionStrategy(new RestSessionExpiredStrategy())
+                .enableSessionUrlRewriting(false)
+                .maximumSessions(1)
+                .maxSessionsPreventsLogin(false)
+                .sessionRegistry(this.sessionRegistry())
+                .expiredSessionStrategy(new RestSessionExpiredStrategy())
                 .and()
-                    .sessionFixation().changeSessionId()
-                    .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                .sessionFixation().changeSessionId()
+                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 .and()
                 .addFilterAt(this.restUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                    .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                    .antMatchers("/", "/login", "/logout", "/error").permitAll()
-                    .antMatchers("/getAuthorities").hasAnyAuthority("ROLE_BLOG", "ROLE_ADMIN", "ROLE_ETC")
-                    .antMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
-                    .antMatchers("/post/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_BLOG")
-                    .antMatchers("/board/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_BLOG")
-                    .anyRequest().authenticated()
+                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .antMatchers("/", "/login", "/logout", "/error").permitAll()
+                .antMatchers("/getAuthorities").hasAnyAuthority("ROLE_BLOG", "ROLE_ADMIN", "ROLE_ETC")
+                .antMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
+                .antMatchers("/post/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_BLOG")
+                .antMatchers("/board/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_BLOG")
+                .anyRequest().authenticated()
                 .and()
-                    .exceptionHandling()
-                    .authenticationEntryPoint(restAuthenticationEntryPoint)
+                .exceptionHandling()
+                .authenticationEntryPoint(restAuthenticationEntryPoint)
                 .and()
                 .logout()
-                    .logoutUrl("/logout")
-                    .deleteCookies("DEVELOBEER-SESSION")
-                    .invalidateHttpSession(true)
-                    .logoutSuccessHandler(new RestLogoutSuccessHandler());
+                .logoutUrl("/logout")
+                .deleteCookies("DEVELOBEER-SESSION")
+                .invalidateHttpSession(true)
+                .logoutSuccessHandler(new RestLogoutSuccessHandler());
     }
 
-    private RestUsernamePasswordAuthenticationFilter restUsernamePasswordAuthenticationFilter(){
+    private RestUsernamePasswordAuthenticationFilter restUsernamePasswordAuthenticationFilter() {
         RestUsernamePasswordAuthenticationFilter filter = new RestUsernamePasswordAuthenticationFilter(this.objectMapper);
         filter.setPostOnly(true);
         filter.setSessionAuthenticationStrategy(this.authStrategy());
@@ -124,22 +124,21 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
     @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() {
-        try{
+        try {
             return super.authenticationManagerBean();
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
 
     @Bean
-    public HttpSessionCsrfTokenRepository getCsrfTokenRepo(){
+    public HttpSessionCsrfTokenRepository getCsrfTokenRepo() {
         return new DevelobeerCsrfTokenRepo().getCsrfTokenRepo();
     }
 
     @Bean
-    public ConcurrentSessionControlAuthenticationStrategy authStrategy(){
+    public ConcurrentSessionControlAuthenticationStrategy authStrategy() {
         ConcurrentSessionControlAuthenticationStrategy strategy = new ConcurrentSessionControlAuthenticationStrategy(this.sessionRegistry());
         strategy.setMaximumSessions(1);
 

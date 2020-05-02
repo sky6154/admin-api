@@ -13,9 +13,9 @@ import java.nio.file.Paths;
 public class WebConfiguration implements WebMvcConfigurer {
 
     @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry){
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/board/**")
-                .addResourceLocations( Paths.get("src/main/resources/").toUri().getPath() + "/board/")
+                .addResourceLocations(Paths.get("src/main/resources/").toUri().getPath() + "/board/")
                 .setCachePeriod(0);
     }
 

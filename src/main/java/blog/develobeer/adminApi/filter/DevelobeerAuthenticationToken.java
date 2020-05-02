@@ -41,29 +41,27 @@ public class DevelobeerAuthenticationToken extends AbstractAuthenticationToken {
         return userDetails.getAuthorities();
     }
 
-    public static String[] splitToken(String decodedString){
+    public static String[] splitToken(String decodedString) {
         String[] list = decodedString.split(":");
 
-        if(list.length < 1){
+        if (list.length < 1) {
             throw new AuthenticationCredentialsNotFoundException("Token is not found.");
-        }
-        else{
+        } else {
             return list;
         }
     }
 
-    public static String encode(String id, String sessionId){
+    public static String encode(String id, String sessionId) {
         String makeOneString = id + ":" + sessionId;
         return TokenManager.encrypt(makeOneString);
     }
 
-    public static String decode(String token){
+    public static String decode(String token) {
         String decrypted = TokenManager.decrypt(token);
 
-        if(decrypted == null){
+        if (decrypted == null) {
             throw new AuthenticationServiceException("Invalid token");
-        }
-        else{
+        } else {
             return decrypted;
         }
     }

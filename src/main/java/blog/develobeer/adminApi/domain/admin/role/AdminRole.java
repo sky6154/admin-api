@@ -12,7 +12,7 @@ import java.sql.Timestamp;
 @Setter
 @Getter
 @Entity
-@Table(name="user_role")
+@Table(name = "user_role")
 @ToString
 public class AdminRole implements Serializable {
     private static final long serialVersionUID = -4245799947333023767L;
@@ -27,6 +27,6 @@ public class AdminRole implements Serializable {
     private String role;
 
     @CreationTimestamp
-    @Column(name="reg_date")
+    @Column(name = "reg_date")
     private Timestamp regDate;
 }

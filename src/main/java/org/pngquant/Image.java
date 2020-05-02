@@ -35,14 +35,17 @@ public class Image extends LiqObject {
      * if this image is used for quantization.
      */
     public native boolean addFixedColor(int r, int g, int b, int a);
+
     public boolean addFixedColor(int r, int g, int b) {
         return addFixedColor(r, g, b, 255);
     }
+
     public native int getWidth();
+
     public native int getHeight();
 
     @Override
-	public void close() {
+    public void close() {
         if (handle != 0) {
             liq_image_destroy(handle);
             handle = 0;
@@ -53,26 +56,27 @@ public class Image extends LiqObject {
         // The JNI wrapper will accept non-premultiplied ABGR and BGR only.
         int type = image.getType();
         if (type != BufferedImage.TYPE_3BYTE_BGR &&
-            type != BufferedImage.TYPE_4BYTE_ABGR &&
-            type != BufferedImage.TYPE_4BYTE_ABGR_PRE) {
-			return 0;
-		}
+                type != BufferedImage.TYPE_4BYTE_ABGR &&
+                type != BufferedImage.TYPE_4BYTE_ABGR_PRE) {
+            return 0;
+        }
 
         WritableRaster raster = image.getRaster();
         ColorModel color = image.getColorModel();
         if (type == BufferedImage.TYPE_4BYTE_ABGR_PRE) {
-			color.coerceData(raster, false);
-		}
+            color.coerceData(raster, false);
+        }
 
         DataBuffer buffer = raster.getDataBuffer();
         if (buffer instanceof DataBufferByte) {
-            byte[] imageData = ((DataBufferByte)buffer).getData();
+            byte[] imageData = ((DataBufferByte) buffer).getData();
             return liq_image_create(attr.handle, imageData,
-                raster.getWidth(), raster.getHeight(), color.getNumComponents());
+                    raster.getWidth(), raster.getHeight(), color.getNumComponents());
         }
         return 0;
     }
 
     private static native long liq_image_create(long attr, byte[] bitmap, int width, int height, int components);
+
     private static native void liq_image_destroy(long handle);
 }

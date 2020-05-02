@@ -5,7 +5,6 @@ import blog.develobeer.adminApi.domain.blog.BlogPost;
 import blog.develobeer.adminApi.utils.AdminContext;
 import blog.develobeer.adminApi.utils.CommonTemplateMethod;
 import blog.develobeer.adminApi.utils.SimpleAES256;
-import org.apache.catalina.core.ApplicationContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.NoResultException;
-import javax.servlet.ServletContext;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -54,14 +52,13 @@ public class PostService {
         } else {
             String SAVE_ROOT;
 
-            if(Arrays.asList(env.getActiveProfiles()).contains("test")){
+            if (Arrays.asList(env.getActiveProfiles()).contains("test")) {
                 SAVE_ROOT = System.getProperty("user.home") + "/workspace/static/";
-            }
-            else{
+            } else {
                 SAVE_ROOT = System.getProperty("user.home");
             }
 
-            if(!SAVE_ROOT.endsWith("/")){
+            if (!SAVE_ROOT.endsWith("/")) {
                 SAVE_ROOT = SAVE_ROOT + "/";
             }
 
@@ -124,7 +121,7 @@ public class PostService {
     public BlogPost updatePost(int boardId, int seq, BlogPost blogPost) {
         Optional<BlogPost> blogPostOptional = blogPostRepository.findById(seq);
 
-        if(blogPostOptional.isPresent()){
+        if (blogPostOptional.isPresent()) {
             BlogPost post = blogPostOptional.get();
 
             post.setBoardId(boardId);
@@ -135,8 +132,7 @@ public class PostService {
             post.setModifyDate(Timestamp.valueOf(LocalDateTime.now()));
 
             return CommonTemplateMethod.simpleSaveTryCatchObjectReturn(blogPostRepository, post);
-        }
-        else{
+        } else {
             throw new NoResultException("Post does not exist.");
         }
     }
@@ -144,15 +140,14 @@ public class PostService {
     public BlogPost deletePost(int seq) {
         Optional<BlogPost> blogPostOptional = blogPostRepository.findById(seq);
 
-        if(blogPostOptional.isPresent()){
+        if (blogPostOptional.isPresent()) {
             BlogPost post = blogPostOptional.get();
 
             post.setIsDelete(true);
             post.setModifyDate(Timestamp.valueOf(LocalDateTime.now()));
 
             return CommonTemplateMethod.simpleSaveTryCatchObjectReturn(blogPostRepository, post);
-        }
-        else{
+        } else {
             throw new NoResultException("Post does not exist.");
         }
     }
@@ -160,20 +155,19 @@ public class PostService {
     public BlogPost restorePost(int seq) {
         Optional<BlogPost> blogPostOptional = blogPostRepository.findById(seq);
 
-        if(blogPostOptional.isPresent()){
+        if (blogPostOptional.isPresent()) {
             BlogPost post = blogPostOptional.get();
 
             post.setIsDelete(false);
             post.setModifyDate(Timestamp.valueOf(LocalDateTime.now()));
 
             return CommonTemplateMethod.simpleSaveTryCatchObjectReturn(blogPostRepository, post);
-        }
-        else{
+        } else {
             throw new NoResultException("Post does not exist.");
         }
     }
 
-    public List<BlogPost> getPostList(int boardId){
+    public List<BlogPost> getPostList(int boardId) {
         return blogPostRepository.findAllByBoardIdOrderBySeqDesc(boardId);
     }
 }

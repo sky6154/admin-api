@@ -8,7 +8,7 @@ public class SecurityInitializer extends AbstractSecurityWebApplicationInitializ
     }
 
     @Override
-    protected boolean enableHttpSessionEventPublisher(){
+    protected boolean enableHttpSessionEventPublisher() {
         return true;
     }
 }

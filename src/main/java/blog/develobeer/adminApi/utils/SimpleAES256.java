@@ -46,10 +46,9 @@ public class SimpleAES256 {
         System.arraycopy(ivBytes, 0, buffer, saltBytes.length, ivBytes.length);
         System.arraycopy(encryptedTextBytes, 0, buffer, saltBytes.length + ivBytes.length, encryptedTextBytes.length);
 
-        if(isBase32){
+        if (isBase32) {
             return base32.encodeAsString(buffer);
-        }
-        else{
+        } else {
             return Base64.getEncoder().encodeToString(buffer);
         }
     }
@@ -74,10 +73,9 @@ public class SimpleAES256 {
 
         cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(ivBytes));
 
-        if(isBase32){
+        if (isBase32) {
             return new String(base32.decode(encryoptedTextBytes));
-        }
-        else{
+        } else {
             return new String(cipher.doFinal(encryoptedTextBytes));
         }
     }

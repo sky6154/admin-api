@@ -40,7 +40,7 @@ public class AdminController {
     @RequestMapping(value = "/add", method = RequestMethod.POST, consumes = "application/json")
     public ResponseEntity add(@RequestBody String json) {
         ObjectMapper objectMapper = new ObjectMapper();
-        try{
+        try {
             Map<String, Object> jsonMap = objectMapper.readValue(json, Map.class);
 
             Admin admin = (Admin) jsonMap.get("admin");
@@ -48,14 +48,13 @@ public class AdminController {
 
             if (adminService.isExist(admin.getId())) {
                 return ResponseEntity.badRequest().body("Admin already exist");
-            }
-            else{
+            } else {
                 Admin result = adminService.addAdmin(admin);
                 Role[] roles = objectMapper.readValue(jsonMap.get("role").toString(), Role[].class);
 
                 List<AdminRole> adminRoleList = new ArrayList<>();
 
-                for(Role role : roles){
+                for (Role role : roles) {
                     AdminRoleId adminRoleId = new AdminRoleId();
                     adminRoleId.setRoleId(role.getRoleId());
                     adminRoleId.setUserSeq(result.getSeq());
@@ -73,8 +72,7 @@ public class AdminController {
 
                 return ResponseEntity.created(uri).body(result);
             }
-        }
-        catch(IOException e){
+        } catch (IOException e) {
             return ResponseEntity.badRequest().build();
         }
     }
@@ -85,7 +83,7 @@ public class AdminController {
     }
 
     @RequestMapping(value = "/password/change", method = RequestMethod.POST)
-    public boolean changePassword(@RequestBody String newPassword){
+    public boolean changePassword(@RequestBody String newPassword) {
         return adminService.changePassword(newPassword);
     }
 }

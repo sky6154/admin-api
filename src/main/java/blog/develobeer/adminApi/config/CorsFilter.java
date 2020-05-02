@@ -21,10 +21,9 @@ public class CorsFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
 
-        if(activeProfile.equals("test")){
+        if (activeProfile.equals("test")) {
             response.setHeader("Access-Control-Allow-Origin", request.getHeader("origin"));
-        }
-        else{
+        } else {
             response.setHeader("Access-Control-Allow-Origin", "https://admin.develobeer.blog");
         }
 

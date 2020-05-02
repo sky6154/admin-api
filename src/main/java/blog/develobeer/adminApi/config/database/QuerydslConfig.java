@@ -15,13 +15,13 @@ public class QuerydslConfig {
     @PersistenceContext(unitName = "admin")
     private EntityManager adminEntityManager;
 
-    @Bean(name="blogQueryFactory")
-    public JPAQueryFactory blogQueryFactory(){
+    @Bean(name = "blogQueryFactory")
+    public JPAQueryFactory blogQueryFactory() {
         return new JPAQueryFactory(blogEntityManager);
     }
 
-    @Bean(name="adminQueryFactory")
-    public JPAQueryFactory adminQueryFactory(){
+    @Bean(name = "adminQueryFactory")
+    public JPAQueryFactory adminQueryFactory() {
         return new JPAQueryFactory(adminEntityManager);
     }
 }

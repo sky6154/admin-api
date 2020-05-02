@@ -3,10 +3,8 @@ package blog.develobeer.adminApi.utils;
 import blog.develobeer.adminApi.domain.admin.user.AdminDetails;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.security.Principal;
-
 public class AdminContext {
-    public static String getAdminName(){
+    public static String getAdminName() {
         AdminDetails adminDetails = (AdminDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return adminDetails.getUsername();
     }

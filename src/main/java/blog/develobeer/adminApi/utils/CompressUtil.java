@@ -30,18 +30,16 @@ public class CompressUtil {
     private static final String IMG_UPLOAD_TEMP_DIR = "/tmp/uploads/";
 
     public static MultipartFile compressImage(MultipartFile multipartFile) {
-        if(multipartFile.getOriginalFilename().endsWith(".png")){
+        if (multipartFile.getOriginalFilename().endsWith(".png")) {
             return compressPng(multipartFile);
-        }
-        else if(multipartFile.getOriginalFilename().endsWith(".jpg") || multipartFile.getOriginalFilename().endsWith(".jpeg")){
+        } else if (multipartFile.getOriginalFilename().endsWith(".jpg") || multipartFile.getOriginalFilename().endsWith(".jpeg")) {
             return comporessJpgWithExternalLib(multipartFile);
-        }
-        else{
+        } else {
             return multipartFile;
         }
     }
 
-    private static MultipartFile comporessJpgWithExternalLib(MultipartFile multipartFile){
+    private static MultipartFile comporessJpgWithExternalLib(MultipartFile multipartFile) {
         try {
             if (!new File(IMG_UPLOAD_TEMP_DIR).exists()) {
                 new File(IMG_UPLOAD_TEMP_DIR).mkdir();
@@ -53,7 +51,7 @@ public class CompressUtil {
             // temp file create
             Path dest = Paths.get(filePath);
             FileChannel fileChannel = FileChannel.open(dest, StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE);
-            fileChannel.write( ByteBuffer.wrap(multipartFile.getBytes()) );
+            fileChannel.write(ByteBuffer.wrap(multipartFile.getBytes()));
             fileChannel.close();
 
             // compression
@@ -62,7 +60,7 @@ public class CompressUtil {
             // temp compressed image read
             BufferedImage originalImage = ImageIO.read(new File(filePath));
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write( originalImage, "jpg", baos );
+            ImageIO.write(originalImage, "jpg", baos);
             baos.flush();
             byte[] imageInByte = baos.toByteArray();
             baos.close();
@@ -71,8 +69,7 @@ public class CompressUtil {
             Files.delete(dest);
 
             return transToMultipartFile(multipartFile, imageInByte);
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return multipartFile;
         }
@@ -80,13 +77,13 @@ public class CompressUtil {
 
     /**
      * 이미 잘 압축된 파일 업로드 시 용량이 커지며 열화가 심해진다.
-     *
+     * <p>
      * 사용하지 않는다.
      *
      * @param multipartFile
      * @return
      */
-    private static MultipartFile compressJpgWithJavaLib(MultipartFile multipartFile){
+    private static MultipartFile compressJpgWithJavaLib(MultipartFile multipartFile) {
         try {
             BufferedImage image = ImageIO.read(multipartFile.getInputStream());
             // get all image writers for JPG format
@@ -100,13 +97,13 @@ public class CompressUtil {
             ImageWriteParam param = writer.getDefaultWriteParam();
 
             // compress to a given quality
-            if(param.canWriteCompressed()){
+            if (param.canWriteCompressed()) {
                 param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
             }
-            if(param.canWriteProgressive()){
+            if (param.canWriteProgressive()) {
                 param.setProgressiveMode(ImageWriteParam.MODE_DEFAULT);
             }
-            if(param.canWriteTiles()){
+            if (param.canWriteTiles()) {
                 param.setTilingMode(ImageWriteParam.MODE_EXPLICIT);
             }
 
@@ -114,9 +111,9 @@ public class CompressUtil {
 
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageOutputStream  ios =  ImageIO.createImageOutputStream(baos);
+            ImageOutputStream ios = ImageIO.createImageOutputStream(baos);
             writer.setOutput(ios);
-            ImageIO.write( image, "jpg", baos );
+            ImageIO.write(image, "jpg", baos);
             writer.write(null, new IIOImage(image, null, null), param);
 
             baos.flush();
@@ -125,18 +122,17 @@ public class CompressUtil {
             writer.dispose();
 
             return transToMultipartFile(multipartFile, imageInByte);
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return multipartFile;
         }
     }
 
-    private static MultipartFile compressPng(MultipartFile multipartFile){
+    private static MultipartFile compressPng(MultipartFile multipartFile) {
         try {
             BufferedImage image = ImageIO.read(multipartFile.getInputStream());
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageOutputStream  ios =  ImageIO.createImageOutputStream(baos);
+            ImageOutputStream ios = ImageIO.createImageOutputStream(baos);
 
             PngQuant pngQuant = new PngQuant();
             pngQuant.setQuality(PNG_QUALITY_MIN, PNG_QUALITY_MAX);
@@ -147,14 +143,13 @@ public class CompressUtil {
             baos.close();
 
             return transToMultipartFile(multipartFile, imageInByte);
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return multipartFile;
         }
     }
 
-    private static MultipartFile transToMultipartFile(MultipartFile multipartFile, byte[] imageInByte){
+    private static MultipartFile transToMultipartFile(MultipartFile multipartFile, byte[] imageInByte) {
         return new MultipartFile() {
             private final byte[] imgContent = imageInByte;
 

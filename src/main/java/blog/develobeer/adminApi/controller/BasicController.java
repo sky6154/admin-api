@@ -14,7 +14,7 @@ import java.util.Collection;
 @RequestMapping("/")
 public class BasicController {
 
-    public BasicController(){
+    public BasicController() {
 
     }
 
@@ -27,7 +27,7 @@ public class BasicController {
     public ResponseEntity<Collection> getAuthorities() {
         try {
             return ResponseEntity.ok(SecurityContextHolder.getContext().getAuthentication().getAuthorities());
-        }catch(Exception e){
+        } catch (Exception e) {
 //            e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }

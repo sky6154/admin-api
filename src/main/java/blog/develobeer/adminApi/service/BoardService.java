@@ -16,12 +16,12 @@ public class BoardService {
 
     @Autowired
     public BoardService(BlogBoardRepository blogBoardRepository,
-                        BlogPostRepository blogPostRepository){
+                        BlogPostRepository blogPostRepository) {
         this.blogBoardRepository = blogBoardRepository;
         this.blogPostRepository = blogPostRepository;
     }
 
-    public List<BlogBoard> getBoardList(){
+    public List<BlogBoard> getBoardList() {
         return blogBoardRepository.findAll();
     }
 }

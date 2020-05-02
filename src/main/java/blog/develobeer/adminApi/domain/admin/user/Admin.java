@@ -14,7 +14,7 @@ import java.sql.Timestamp;
 @Setter
 @Getter
 @Entity
-@Table(name="user")
+@Table(name = "user")
 @ToString
 public class Admin implements Serializable {
 

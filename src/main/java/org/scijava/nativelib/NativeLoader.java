@@ -7,13 +7,13 @@
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -78,78 +78,75 @@ import java.io.IOException;
  */
 public class NativeLoader {
 
-	private static JniExtractor jniExtractor = null;
+    private static JniExtractor jniExtractor = null;
 
-	static {
-		try {
-			/* 
-			 * We provide two implementations of JniExtractor
-			 * 
-			 * The first will work with transitively, dynamically linked libraries with shared global variables 
-			 *   (e.g. dynamically linked c++) but can only be used by one ClassLoader in the JVM.
-			 *   
-			 * The second can be used by multiple ClassLoaders in the JVM but will only work if global variables 
-			 *   are not shared between transitively, dynamically linked libraries.
-			 * 
-			 * For convenience we assume that if the NativeLoader is loaded by the system ClassLoader then it should be 
-			 *   use the first form, and that if it is loaded by a different ClassLoader then it should use the second.
-			 */
-			if (NativeLoader.class.getClassLoader() == ClassLoader
-				.getSystemClassLoader())
-			{
-				jniExtractor = new DefaultJniExtractor();
-			}
-			else {
-				jniExtractor = new WebappJniExtractor("Classloader");
-			}
-		}
-		catch (final IOException e) {
-			throw new ExceptionInInitializerError(e);
-		}
-	}
+    static {
+        try {
+            /*
+             * We provide two implementations of JniExtractor
+             *
+             * The first will work with transitively, dynamically linked libraries with shared global variables
+             *   (e.g. dynamically linked c++) but can only be used by one ClassLoader in the JVM.
+             *
+             * The second can be used by multiple ClassLoaders in the JVM but will only work if global variables
+             *   are not shared between transitively, dynamically linked libraries.
+             *
+             * For convenience we assume that if the NativeLoader is loaded by the system ClassLoader then it should be
+             *   use the first form, and that if it is loaded by a different ClassLoader then it should use the second.
+             */
+            if (NativeLoader.class.getClassLoader() == ClassLoader
+                    .getSystemClassLoader()) {
+                jniExtractor = new DefaultJniExtractor();
+            } else {
+                jniExtractor = new WebappJniExtractor("Classloader");
+            }
+        } catch (final IOException e) {
+            throw new ExceptionInInitializerError(e);
+        }
+    }
 
-	/**
-	 * Extract the given library from a jar, and load it.
-	 * <p>
-	 * The default jni extractor expects libraries to be in META-INF/lib/, with
-	 * their platform-dependent name.
-	 * 
-	 * @param libname platform-independent library name (as would be passed to
-	 *          System.loadLibrary)
-	 * @throws IOException if there is a problem extracting the jni library
-	 * @throws SecurityException if a security manager exists and its
-	 *           <code>checkLink</code> method doesn't allow loading of the
-	 *           specified dynamic library
-	 */
-	public static void loadLibrary(final String libname) throws IOException {
-		// TODO pass in library path or get rid of this method
-		System.load(jniExtractor.extractJni("META-INF/lib/", libname).getAbsolutePath());
-	}
+    /**
+     * Extract the given library from a jar, and load it.
+     * <p>
+     * The default jni extractor expects libraries to be in META-INF/lib/, with
+     * their platform-dependent name.
+     *
+     * @param libname platform-independent library name (as would be passed to
+     *                System.loadLibrary)
+     * @throws IOException       if there is a problem extracting the jni library
+     * @throws SecurityException if a security manager exists and its
+     *                           <code>checkLink</code> method doesn't allow loading of the
+     *                           specified dynamic library
+     */
+    public static void loadLibrary(final String libname) throws IOException {
+        // TODO pass in library path or get rid of this method
+        System.load(jniExtractor.extractJni("META-INF/lib/", libname).getAbsolutePath());
+    }
 
-	/**
-	 * Extract all libraries registered for auto-extraction by way of
-	 * META-INF/lib/AUTOEXTRACT.LIST resources. The application must call
-	 * {@link #extractRegistered()} at some suitably early point in its
-	 * initialization if it is using libraries packaged in this way.
-	 * 
-	 * @throws IOException if there is a problem extracting the libraries
-	 */
-	public static void extractRegistered() throws IOException {
-		jniExtractor.extractRegistered();
-	}
+    /**
+     * Extract all libraries registered for auto-extraction by way of
+     * META-INF/lib/AUTOEXTRACT.LIST resources. The application must call
+     * {@link #extractRegistered()} at some suitably early point in its
+     * initialization if it is using libraries packaged in this way.
+     *
+     * @throws IOException if there is a problem extracting the libraries
+     */
+    public static void extractRegistered() throws IOException {
+        jniExtractor.extractRegistered();
+    }
 
-	/**
-	 * @return the JniExtractor implementation object.
-	 */
-	public static JniExtractor getJniExtractor() {
-		return jniExtractor;
-	}
+    /**
+     * @return the JniExtractor implementation object.
+     */
+    public static JniExtractor getJniExtractor() {
+        return jniExtractor;
+    }
 
-	/**
-	 * @param jniExtractor JniExtractor implementation to use instead of the
-	 *          default.
-	 */
-	public static void setJniExtractor(final JniExtractor jniExtractor) {
-		NativeLoader.jniExtractor = jniExtractor;
-	}
+    /**
+     * @param jniExtractor JniExtractor implementation to use instead of the
+     *                     default.
+     */
+    public static void setJniExtractor(final JniExtractor jniExtractor) {
+        NativeLoader.jniExtractor = jniExtractor;
+    }
 }

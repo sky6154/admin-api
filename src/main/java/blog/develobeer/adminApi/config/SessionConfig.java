@@ -36,7 +36,7 @@ public class SessionConfig {
 
 
     @Autowired
-    public SessionConfig(Environment env){
+    public SessionConfig(Environment env) {
         this.env = env;
 //        this.sessionRepository = sessionRepository;
     }
@@ -45,7 +45,7 @@ public class SessionConfig {
     public LettuceConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(redisHost, redisPort);
 
-        if(Arrays.asList(env.getActiveProfiles()).contains("test")){
+        if (Arrays.asList(env.getActiveProfiles()).contains("test")) {
             redisStandaloneConfiguration.setPassword(env.getProperty("spring.redis.password"));
         }
 
@@ -57,8 +57,8 @@ public class SessionConfig {
         final RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactory());
         template.setKeySerializer(new StringRedisSerializer());
-        template.setHashValueSerializer(new GenericToStringSerializer<>( Object.class ));
-        template.setValueSerializer(new GenericToStringSerializer<>( Object.class ));
+        template.setHashValueSerializer(new GenericToStringSerializer<>(Object.class));
+        template.setValueSerializer(new GenericToStringSerializer<>(Object.class));
 
         return template;
     }
@@ -77,7 +77,7 @@ public class SessionConfig {
         cookieSerializer.setUseHttpOnlyCookie(true);
         cookieSerializer.setUseSecureCookie(true);
 
-        if(Arrays.asList(env.getActiveProfiles()).contains("test")){
+        if (Arrays.asList(env.getActiveProfiles()).contains("test")) {
             cookieSerializer.setUseSecureCookie(false);
         }
 
@@ -96,7 +96,7 @@ public class SessionConfig {
     }
 
     @Bean
-    public PasswordEncoder getPasswordEncoder(){
+    public PasswordEncoder getPasswordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 }

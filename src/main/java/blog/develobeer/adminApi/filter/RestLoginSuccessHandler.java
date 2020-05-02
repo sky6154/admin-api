@@ -6,23 +6,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.parameters.P;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.csrf.CsrfToken;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Enumeration;
-import java.util.List;
 
 public class RestLoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final ObjectMapper mapper;
 
-    public RestLoginSuccessHandler(ObjectMapper mapper){
+    public RestLoginSuccessHandler(ObjectMapper mapper) {
         this.mapper = mapper;
     }
 

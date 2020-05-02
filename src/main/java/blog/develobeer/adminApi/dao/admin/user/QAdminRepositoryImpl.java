@@ -19,7 +19,7 @@ public class QAdminRepositoryImpl implements QAdminRepository {
 
     @Autowired
     public QAdminRepositoryImpl(
-            @Qualifier("adminQueryFactory") JPAQueryFactory adminQueryFactory){
+            @Qualifier("adminQueryFactory") JPAQueryFactory adminQueryFactory) {
         this.adminQueryFactory = adminQueryFactory;
     }
 
@@ -32,11 +32,11 @@ public class QAdminRepositoryImpl implements QAdminRepository {
 
         List<Admin> adminList = new ArrayList<>();
 
-        for(Tuple row : result){
+        for (Tuple row : result) {
             Admin res = row.get(admin);
             res.setRole(row.get(role1));
 
-            if(Objects.nonNull( res.getPwd() )){
+            if (Objects.nonNull(res.getPwd())) {
                 res.setPwd(null);
             }
 

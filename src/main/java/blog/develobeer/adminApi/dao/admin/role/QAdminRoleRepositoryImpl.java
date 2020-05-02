@@ -19,12 +19,12 @@ public class QAdminRoleRepositoryImpl implements QAdminRoleRepository {
 
     @Autowired
     public QAdminRoleRepositoryImpl(
-            @Qualifier("adminQueryFactory") JPAQueryFactory adminQueryFactory){
+            @Qualifier("adminQueryFactory") JPAQueryFactory adminQueryFactory) {
         this.adminQueryFactory = adminQueryFactory;
     }
 
     @Override
-    public List<AdminRole> getAdminRolesByUserId(String id){
+    public List<AdminRole> getAdminRolesByUserId(String id) {
         List<Tuple> result = adminQueryFactory.select(admin.id, role1.role, adminRole.adminRoleId.userSeq, adminRole.adminRoleId.roleId, adminRole.regDate)
                 .from(admin, role1, adminRole)
                 .where(admin.id.eq(id).and(admin.seq.eq(adminRole.adminRoleId.userSeq)).and(adminRole.adminRoleId.roleId.eq(role1.roleId)))
@@ -32,7 +32,7 @@ public class QAdminRoleRepositoryImpl implements QAdminRoleRepository {
 
         List<AdminRole> adminList = new ArrayList<>();
 
-        for(Tuple row : result){
+        for (Tuple row : result) {
             AdminRole ar = new AdminRole();
             AdminRoleId ari = new AdminRoleId();
 

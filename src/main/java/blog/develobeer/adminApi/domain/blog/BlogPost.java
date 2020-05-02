@@ -12,12 +12,12 @@ import java.sql.Timestamp;
 @Setter
 @Getter
 @Entity
-@Table(name="blog_post")
+@Table(name = "blog_post")
 public class BlogPost implements Serializable {
     private static final long serialVersionUID = 1254837323714973222L;
 
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer seq;
 
     @Column
@@ -32,17 +32,17 @@ public class BlogPost implements Serializable {
     @Column
     private String author;
 
-    @Column(name="board_id")
+    @Column(name = "board_id")
     private Integer boardId;
 
-    @Column(name="is_delete")
+    @Column(name = "is_delete")
     private Boolean isDelete = false;
 
     @UpdateTimestamp
-    @Column(name="modify_date")
+    @Column(name = "modify_date")
     private Timestamp modifyDate;
 
     @CreationTimestamp
-    @Column(name="reg_date", updatable = false)
+    @Column(name = "reg_date", updatable = false)
     private Timestamp regDate;
 }

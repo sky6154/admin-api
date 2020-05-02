@@ -7,13 +7,13 @@
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 1. Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -52,64 +52,64 @@ import java.io.IOException;
  * WARNING: This can expose strange and wonderful bugs in jni code. These bugs
  * generally stem from transitive dependencies of the jni library and can be
  * solved by linking these dependencies statically to form a single library
- * 
+ *
  * @author <a href="mailto:markjh@mxtelecom.com">markjh</a>
  */
 public class WebappJniExtractor extends BaseJniExtractor {
 
-	private final File nativeDir;
-	private final File jniSubDir;
+    private final File nativeDir;
+    private final File jniSubDir;
 
-	/**
-	 * @param classloaderName is a friendly name for your classloader which will
-	 *          be embedded in the directory name of the classloader-specific
-	 *          subdirectory which will be created.
-	 */
-	public WebappJniExtractor(final String classloaderName) throws IOException {
-		nativeDir = new File(System.getProperty("java.library.tmpdir", "tmplib"));
-		// Order of operations is such thatwe do not error if we are racing with
-		// another thread to create the directory.
-		nativeDir.mkdirs();
-		if (!nativeDir.isDirectory()) {
-			throw new IOException(
-				"Unable to create native library working directory " + nativeDir);
-		}
+    /**
+     * @param classloaderName is a friendly name for your classloader which will
+     *                        be embedded in the directory name of the classloader-specific
+     *                        subdirectory which will be created.
+     */
+    public WebappJniExtractor(final String classloaderName) throws IOException {
+        nativeDir = new File(System.getProperty("java.library.tmpdir", "tmplib"));
+        // Order of operations is such thatwe do not error if we are racing with
+        // another thread to create the directory.
+        nativeDir.mkdirs();
+        if (!nativeDir.isDirectory()) {
+            throw new IOException(
+                    "Unable to create native library working directory " + nativeDir);
+        }
 
-		final long now = System.currentTimeMillis();
-		File trialJniSubDir;
-		int attempt = 0;
-		while (true) {
-			trialJniSubDir =
-				new File(nativeDir, classloaderName + "." + now + "." + attempt);
-			if (trialJniSubDir.mkdir()) break;
-			if (trialJniSubDir.exists()) {
-				attempt++;
-				continue;
-			}
-			throw new IOException(
-				"Unable to create native library working directory " + trialJniSubDir);
-		}
-		jniSubDir = trialJniSubDir;
-		jniSubDir.deleteOnExit();
-	}
+        final long now = System.currentTimeMillis();
+        File trialJniSubDir;
+        int attempt = 0;
+        while (true) {
+            trialJniSubDir =
+                    new File(nativeDir, classloaderName + "." + now + "." + attempt);
+            if (trialJniSubDir.mkdir()) break;
+            if (trialJniSubDir.exists()) {
+                attempt++;
+                continue;
+            }
+            throw new IOException(
+                    "Unable to create native library working directory " + trialJniSubDir);
+        }
+        jniSubDir = trialJniSubDir;
+        jniSubDir.deleteOnExit();
+    }
 
-	@Override
-	protected void finalize() throws Throwable {
-		super.finalize();
-		final File[] files = jniSubDir.listFiles();
-		for (final File file : files) {
-			file.delete();
-		}
-		jniSubDir.delete();
-	}
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        final File[] files = jniSubDir.listFiles();
+        for (final File file : files) {
+            file.delete();
+        }
+        jniSubDir.delete();
+    }
 
-	@Override
-	public File getJniDir() {
-		return jniSubDir;
-	}
+    @Override
+    public File getJniDir() {
+        return jniSubDir;
+    }
 
-	@Override
-	public File getNativeDir() {
-		return nativeDir;
-	}
+    @Override
+    public File getNativeDir() {
+        return nativeDir;
+    }
 }

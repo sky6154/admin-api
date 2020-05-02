@@ -1,6 +1,5 @@
 package blog.develobeer.adminApi.filter;
 
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 
 public class DevelobeerCsrfTokenRepo {
@@ -10,7 +9,7 @@ public class DevelobeerCsrfTokenRepo {
     public static String CSRF_SESSION_PARAM = "DEVELOBEER-CSRF-PARAM";
     public static String CSRF_SESSION_ATTR = "DEVELOBEER-CSRF-TOKEN";
 
-    public DevelobeerCsrfTokenRepo(){
+    public DevelobeerCsrfTokenRepo() {
         this.httpSessionCsrfTokenRepository = new HttpSessionCsrfTokenRepository();
         this.httpSessionCsrfTokenRepository.setSessionAttributeName(CSRF_SESSION_ATTR);
         this.httpSessionCsrfTokenRepository.setHeaderName(CSRF_SESSION_HEADER);
@@ -19,7 +18,7 @@ public class DevelobeerCsrfTokenRepo {
 //        this.cookieCsrfTokenRepository.setCookieName(CSRF_COOKIE_ATTR);
     }
 
-    public HttpSessionCsrfTokenRepository getCsrfTokenRepo(){
+    public HttpSessionCsrfTokenRepository getCsrfTokenRepo() {
         return this.httpSessionCsrfTokenRepository;
     }
 }

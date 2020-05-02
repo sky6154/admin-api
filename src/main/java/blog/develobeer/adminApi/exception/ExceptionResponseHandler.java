@@ -12,18 +12,18 @@ import java.io.IOException;
 public class ExceptionResponseHandler {
 
     @ExceptionHandler(NoResultException.class)
-    public ResponseEntity noResultExceptionHandler(NoResultException ne){
+    public ResponseEntity noResultExceptionHandler(NoResultException ne) {
         return ResponseEntity.badRequest().build();
     }
 
     @ExceptionHandler(IOException.class)
-    public ResponseEntity exceptionHandler(IOException ioe){
+    public ResponseEntity exceptionHandler(IOException ioe) {
         ioe.printStackTrace();
         return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity exceptionHandler(Exception e){
+    public ResponseEntity exceptionHandler(Exception e) {
         e.printStackTrace();
         return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }

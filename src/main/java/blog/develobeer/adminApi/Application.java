@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration;
 
 @SpringBootApplication(
-        exclude = { RedisRepositoriesAutoConfiguration.class }
+        exclude = {RedisRepositoriesAutoConfiguration.class}
 )
 public class Application {
     public static void main(String[] args) {

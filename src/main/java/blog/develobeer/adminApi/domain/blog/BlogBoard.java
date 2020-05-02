@@ -14,21 +14,21 @@ import java.sql.Timestamp;
 @Setter
 @Getter
 @Entity
-@Table(name="blog_board")
+@Table(name = "blog_board")
 public class BlogBoard implements Serializable {
     private static final long serialVersionUID = -5208624951912909252L;
 
     @Id
-    @Column(name="board_id")
+    @Column(name = "board_id")
     private Integer boardId;
 
     @Column
     private String description;
 
-    @Column(name="is_open")
+    @Column(name = "is_open")
     private Boolean isOpen;
 
     @CreationTimestamp
-    @Column(name="reg_date")
+    @Column(name = "reg_date")
     private Timestamp regDate;
 }

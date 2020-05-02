@@ -13,13 +13,13 @@ import java.io.Serializable;
 @Setter
 @Getter
 @Entity
-@Table(name="role")
+@Table(name = "role")
 @ToString
 public class Role implements Serializable {
     private static final long serialVersionUID = -8292988511014571791L;
 
     @Id
-    @Column(name="role_id")
+    @Column(name = "role_id")
     private Integer roleId;
 
     @Column
