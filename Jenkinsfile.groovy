@@ -1,14 +1,19 @@
-
 import jenkins.*
 import jenkins.model.*
 import hudson.*
 import hudson.model.*
 
 node {
+    def NAME = "admin-api"
+    def DOCKER_REPO = "hub.develobeer.blog"
+
     try{
         stage('Checkout'){
             checkout scm
         }
+
+        def shortRevision = sh(returnStdout: true, script: "git log -n 1 --pretty=format:'%h'").trim()
+        println("short revision : " + shortRevision)
 
         stage('Copy application.yml'){
             if(!fileExists('./src/main/resources')){
@@ -25,65 +30,54 @@ node {
 
         switch(params.JOB){
             case "build&deploy":
-                stage('docker-compose build & save image'){
-                    sh "docker-compose build"
-                    sh "docker save -o admin-api.tar admin-api:latest"
+                stage("docker build with tag") {
+                    sh "docker build . -t ${DOCKER_REPO}/${NAME}:${shortRevision}"
                 }
 
-                def deployWorkerList = []
+                stage("docker login & image push") {
+                    sh "docker login hub.develobeer.blog -u ${params.DOCKER_REPO_USER} -p ${params.DOCKER_REPO_PASS}"
+                    sh "docker push ${DOCKER_REPO}/${NAME}:${shortRevision}"
+                }
 
                 if("${env.CURRENT_ADMIN_BACK_ENV}" == "blue"){
-                    deployWorkerList.add("GreenB2")
-
-                    stage('deploy swarm worker'){
-                        def stepsForParallel = deployWorkerList.collectEntries {
-                            ["${it}" : deployWorker(it)]
-                        }
-                        parallel stepsForParallel
-                    }
-
                     stage('deploy swarm manager'){
-                        deployManager("GreenB1")
+                        deployManager("GreenB1", shortRevision)
                     }
 
-                    stage('overwrite env'){
-                        overwriteEnv("green")
-                    }
+                    if (currentBuild.result == "SUCCESS") {
+                        stage('overwrite env') {
+                            overwriteEnv("green")
+                        }
 
-                    stage('overwrite nginx conf'){
-                        sh "docker cp /var/deploy_env_conf/admin_green_back.conf myNginx:/etc/nginx/conf.d/target_admin_back.conf"
-                    }
+                        stage('overwrite nginx conf') {
+                            sh "docker cp /var/deploy_env_conf/admin_green_back.conf myNginx:/etc/nginx/conf.d/target_admin_back.conf"
+                        }
 
-                    stage('reload nginx'){
-                        sh "docker kill -s HUP myNginx"
+                        stage('reload nginx') {
+                            sh "docker kill -s HUP myNginx"
+                        }
                     }
                 }
-                else{
-                    deployWorkerList.add("BlueB2")
-
-                    stage('deploy swarm worker'){
-                        def stepsForParallel = deployWorkerList.collectEntries {
-                            ["${it}" : deployWorker(it)]
-                        }
-                        parallel stepsForParallel
-                    }
-
+                else{ // green
                     stage('deploy swarm manager'){
-                        deployManager("BlueB1")
+                        deployManager("BlueB1", shortRevision)
                     }
 
-                    stage('overwrite env'){
-                        overwriteEnv("blue")
-                    }
+                    if (currentBuild.result == "SUCCESS") {
+                        stage('overwrite env') {
+                            overwriteEnv("blue")
+                        }
 
-                    stage('overwrite nginx conf'){
-                        sh "docker cp /var/deploy_env_conf/admin_blue_back.conf myNginx:/etc/nginx/conf.d/target_admin_back.conf"
-                    }
+                        stage('overwrite nginx conf') {
+                            sh "docker cp /var/deploy_env_conf/admin_blue_back.conf myNginx:/etc/nginx/conf.d/target_admin_back.conf"
+                        }
 
-                    stage('reload nginx'){
-                        sh "docker kill -s HUP myNginx"
+                        stage('reload nginx') {
+                            sh "docker kill -s HUP myNginx"
+                        }
                     }
                 }
+
                 break
         }
     }
@@ -95,38 +89,20 @@ node {
 }
 
 
-def deployManager(configName){
+def deployManager(configName, shortRevision) {
     sshPublisher(publishers: [
             sshPublisherDesc(
                     configName: configName,
                     transfers: [
-                            sshTransfer(sourceFiles: 'admin-api.tar, deploy-admin-manager.sh',
+                            sshTransfer(sourceFiles: 'docker-compose.yml, deploy-manager.sh',
                                     execCommand: "cd /root && \
-                                  chmod 744 ./deploy-admin-manager.sh && \
-                                  ./deploy-admin-manager.sh")
+                                    docker login hub.develobeer.blog -u ${params.DOCKER_REPO_USER} -p ${params.DOCKER_REPO_PASS} && \
+                                    chmod 744 ./deploy-admin-manager.sh && \
+                                    ./deploy-admin-manager.sh ${shortRevision}")
                     ],
             )
-    ])
-}
-
-def deployWorker(configName){
-    // We need to wrap what we return in a Groovy closure, or else it's invoked
-    // when this method is called, not when we pass it to parallel.
-    // To do this, you need to wrap the code below in { }, and either return
-    // that explicitly, or use { -> } syntax.
-    return {
-        sshPublisher(publishers: [
-                sshPublisherDesc(
-                        configName: configName,
-                        transfers: [
-                                sshTransfer(sourceFiles: 'admin-api.tar, deploy-admin-worker.sh',
-                                        execCommand: "cd /root && \
-                                    chmod 744 ./deploy-admin-worker.sh && \
-                                    ./deploy-admin-worker.sh")
-                        ],
-                )
-        ])
-    }
+    ],
+            failOnError: true)
 }
 
 def overwriteEnv(activeEnv){

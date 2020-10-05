@@ -2,29 +2,17 @@ version: '3'
 
 services:
   my_blog_admin_api:
-    build:
-      context: .
-
-    image: admin-api:latest
-
-    container_name: myBlogAdminAPI
+    image: hub.develobeer.blog/admin-api:${TAG}
 
     volumes:
       - /static:~/www
 
     deploy:
+      replicas: 2
       resources:
         limits:
           cpus: '0.50'
           memory: 512M
-#        reservations:
-#          cpus: '0.50'
-#          memory: 512M
 
     ports:
       - "8888:8080"
-
-    command: >
-      -c "
-      java -Djava.security.egd=file:/dev/./urandom -Dspring.profiles.active=live -jar /develobeer-admin.jar -server -Xmx1g
-      "

@@ -20,21 +20,24 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: "com.ewerk.gradle.plugins.querydsl"
 
+def projectName = "develobeer-admin"
+def adminVersion = "latest"
+def queryDslGeneratedDir = 'src/main/generated'
+
 group = 'blog.develobeer'
 version = 'latest'
 //sourceCompatibility = '11'
 
 bootJar{
-    project.ext.set("archiveBaseName", "develobeer-admin");
-    project.ext.set("archiveVersion", "lastest");
-    baseName = 'develobeer-admin'
+//    project.ext.set("archiveBaseName", "develobeer-admin");
+//    project.ext.set("archiveVersion", "lastest");
+    bseName = projectName
+    version = adminVersion
 }
 
 repositories {
     mavenCentral()
 }
-
-def queryDslGeneratedDir = 'src/main/generated'
 
 querydsl {
     library = "com.querydsl:querydsl-apt"
