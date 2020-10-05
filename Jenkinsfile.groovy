@@ -94,7 +94,7 @@ def deployManager(configName, shortRevision) {
             sshPublisherDesc(
                     configName: configName,
                     transfers: [
-                            sshTransfer(sourceFiles: 'docker-compose.yml, deploy-admin-manager.sh',
+                            sshTransfer(sourceFiles: 'docker-compose-admin.yml, deploy-admin-manager.sh',
                                     execCommand: "cd /root && \
                                     docker login hub.develobeer.blog -u ${params.DOCKER_REPO_USER} -p ${params.DOCKER_REPO_PASS} && \
                                     chmod 744 ./deploy-admin-manager.sh && \
