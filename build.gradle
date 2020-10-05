@@ -31,7 +31,7 @@ version = 'latest'
 bootJar{
 //    project.ext.set("archiveBaseName", "develobeer-admin");
 //    project.ext.set("archiveVersion", "lastest");
-    bseName = projectName
+    baseName = projectName
     version = adminVersion
 }
 
