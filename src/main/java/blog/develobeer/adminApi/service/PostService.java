@@ -55,7 +55,7 @@ public class PostService {
             if (Arrays.asList(env.getActiveProfiles()).contains("test")) {
                 SAVE_ROOT = System.getProperty("user.home") + "/workspace/static/";
             } else {
-                SAVE_ROOT = System.getProperty("user.home");
+                SAVE_ROOT = "/static/";
             }
 
             if (!SAVE_ROOT.endsWith("/")) {
@@ -103,15 +103,7 @@ public class PostService {
                 counter++;
             }
 
-            Path writePath = Files.write(path, bytes);
-            System.out.println("### FILE SAVE RESULT ###");
-            System.out.println(writePath);
-            System.out.println(writePath.toString());
-            System.out.println(writePath.toAbsolutePath());
-            System.out.println(SAVE_LOCATION);
-            System.out.println(path);
-            System.out.println(fileName);
-            System.out.println(REF_LOCATION);
+            Files.write(path, bytes);
 
             result.put("fileName", fileName);
             result.put("path", REF_LOCATION);
