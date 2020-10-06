@@ -103,7 +103,15 @@ public class PostService {
                 counter++;
             }
 
-            Files.write(path, bytes);
+            Path writePath = Files.write(path, bytes);
+            System.out.println("### FILE SAVE RESULT ###");
+            System.out.println(writePath);
+            System.out.println(writePath.toString());
+            System.out.println(writePath.toAbsolutePath());
+            System.out.println(SAVE_LOCATION);
+            System.out.println(path);
+            System.out.println(fileName);
+            System.out.println(REF_LOCATION);
 
             result.put("fileName", fileName);
             result.put("path", REF_LOCATION);
