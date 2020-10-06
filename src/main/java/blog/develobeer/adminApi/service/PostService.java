@@ -55,7 +55,7 @@ public class PostService {
             if (Arrays.asList(env.getActiveProfiles()).contains("test")) {
                 SAVE_ROOT = System.getProperty("user.home") + "/workspace/static/";
             } else {
-                SAVE_ROOT = "/static/";
+                SAVE_ROOT = System.getProperty("user.home") + "/www/";
             }
 
             if (!SAVE_ROOT.endsWith("/")) {
