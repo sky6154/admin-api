@@ -1,24 +1,23 @@
 package blog.develobeer.adminApi.filter;
 
-import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 public class DevelobeerCsrfTokenRepo {
 
-    private final HttpSessionCsrfTokenRepository httpSessionCsrfTokenRepository;
-    public static String CSRF_SESSION_HEADER = "DEVELOBEER-CSRF";
-    public static String CSRF_SESSION_PARAM = "DEVELOBEER-CSRF-PARAM";
-    public static String CSRF_SESSION_ATTR = "DEVELOBEER-CSRF-TOKEN";
+    private final CookieCsrfTokenRepository cookieCsrfTokenRepository;
+    public static String CSRF_HEADER = "DEVELOBEER-CSRF-HEADER";
+    public static String CSRF_PARAM = "DEVELOBEER-CSRF-PARAM";
+    public static String CSRF_ATTR = "DEVELOBEER-CSRF-TOKEN";
 
     public DevelobeerCsrfTokenRepo() {
-        this.httpSessionCsrfTokenRepository = new HttpSessionCsrfTokenRepository();
-        this.httpSessionCsrfTokenRepository.setSessionAttributeName(CSRF_SESSION_ATTR);
-        this.httpSessionCsrfTokenRepository.setHeaderName(CSRF_SESSION_HEADER);
-        this.httpSessionCsrfTokenRepository.setParameterName(CSRF_SESSION_PARAM);
-//        this.cookieCsrfTokenRepository.setCookieHttpOnly(true);
-//        this.cookieCsrfTokenRepository.setCookieName(CSRF_COOKIE_ATTR);
+        this.cookieCsrfTokenRepository = new CookieCsrfTokenRepository();
+        this.cookieCsrfTokenRepository.setCookieHttpOnly(false);
+        this.cookieCsrfTokenRepository.setHeaderName(CSRF_HEADER);
+        this.cookieCsrfTokenRepository.setCookieName(CSRF_ATTR);
+        this.cookieCsrfTokenRepository.setParameterName(CSRF_PARAM);
     }
 
-    public HttpSessionCsrfTokenRepository getCsrfTokenRepo() {
-        return this.httpSessionCsrfTokenRepository;
+    public CookieCsrfTokenRepository getCsrfTokenRepo() {
+        return this.cookieCsrfTokenRepository;
     }
 }

@@ -13,10 +13,8 @@ public class AuthenticationToken {
     private String csrfToken;
     private String csrfHeader;
 
-    public AuthenticationToken(String username, Collection collection, String csrfHeader, String csrfToken) {
+    public AuthenticationToken(String username, Collection collection) {
         this.username = username;
         this.authorities = collection;
-        this.csrfHeader = csrfHeader;
-        this.csrfToken = csrfToken;
     }
 }
