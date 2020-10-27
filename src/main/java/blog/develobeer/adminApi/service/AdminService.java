@@ -29,6 +29,8 @@ public class AdminService implements UserDetailsService, Serializable {
     private final AdminRoleRepository adminRoleRepository;
     private final PasswordEncoder passwordEncoder;
 
+    private static final String ROLE_PREFIX = "ROLE_";
+
     @Autowired
     public AdminService(AdminRepository adminRepository,
                         AdminRoleRepository adminRoleRepository,
@@ -48,7 +50,7 @@ public class AdminService implements UserDetailsService, Serializable {
 
         Collection<? extends GrantedAuthority> authorities = adminRoles
                 .stream()
-                .map(adminRole -> new SimpleGrantedAuthority("ROLE_" + adminRole.getRole()))
+                .map(adminRole -> new SimpleGrantedAuthority(ROLE_PREFIX + adminRole.getRole()))
                 .collect(Collectors.toList());
 
         return AdminDetails.builder()

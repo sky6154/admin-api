@@ -15,10 +15,6 @@ import java.util.Collection;
 @RequestMapping("/")
 public class BasicController {
 
-    public BasicController() {
-
-    }
-
     @GetMapping("/")
     public String home() {
         return "HELLO WORLD";

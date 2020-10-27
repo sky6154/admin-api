@@ -39,7 +39,6 @@ public class SessionConfig {
     @Autowired
     public SessionConfig(Environment env) {
         this.env = env;
-//        this.sessionRepository = sessionRepository;
     }
 
     @Bean

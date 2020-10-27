@@ -12,13 +12,10 @@ import java.util.List;
 public class BoardService {
 
     private BlogBoardRepository blogBoardRepository;
-    private BlogPostRepository blogPostRepository;
 
     @Autowired
-    public BoardService(BlogBoardRepository blogBoardRepository,
-                        BlogPostRepository blogPostRepository) {
+    public BoardService(BlogBoardRepository blogBoardRepository) {
         this.blogBoardRepository = blogBoardRepository;
-        this.blogPostRepository = blogPostRepository;
     }
 
     public List<BlogBoard> getBoardList() {
