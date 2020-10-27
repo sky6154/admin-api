@@ -33,13 +33,13 @@ public class CompressUtil {
         if (multipartFile.getOriginalFilename().endsWith(".png")) {
             return compressPng(multipartFile);
         } else if (multipartFile.getOriginalFilename().endsWith(".jpg") || multipartFile.getOriginalFilename().endsWith(".jpeg")) {
-            return comporessJpgWithExternalLib(multipartFile);
+            return compressJpgWithExternalLib(multipartFile);
         } else {
             return multipartFile;
         }
     }
 
-    private static MultipartFile comporessJpgWithExternalLib(MultipartFile multipartFile) {
+    private static MultipartFile compressJpgWithExternalLib(MultipartFile multipartFile) {
         try {
             if (!new File(IMG_UPLOAD_TEMP_DIR).exists()) {
                 new File(IMG_UPLOAD_TEMP_DIR).mkdir();
