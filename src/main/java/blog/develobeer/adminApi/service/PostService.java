@@ -3,7 +3,6 @@ package blog.develobeer.adminApi.service;
 import blog.develobeer.adminApi.dao.blog.BlogPostRepository;
 import blog.develobeer.adminApi.domain.blog.BlogPost;
 import blog.develobeer.adminApi.utils.AdminContext;
-import blog.develobeer.adminApi.utils.CommonTemplateMethod;
 import blog.develobeer.adminApi.utils.SimpleAES256;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -131,7 +130,7 @@ public class PostService {
             post.setAuthor(AdminContext.getAdminName());
             post.setModifyDate(Timestamp.valueOf(LocalDateTime.now()));
 
-            return CommonTemplateMethod.simpleSaveTryCatchObjectReturn(blogPostRepository, post);
+            return blogPostRepository.saveAndFlush(post);
         } else {
             throw new NoResultException("Post does not exist.");
         }
@@ -146,7 +145,7 @@ public class PostService {
             post.setIsDelete(true);
             post.setModifyDate(Timestamp.valueOf(LocalDateTime.now()));
 
-            return CommonTemplateMethod.simpleSaveTryCatchObjectReturn(blogPostRepository, post);
+            return blogPostRepository.saveAndFlush(post);
         } else {
             throw new NoResultException("Post does not exist.");
         }
@@ -161,7 +160,7 @@ public class PostService {
             post.setIsDelete(false);
             post.setModifyDate(Timestamp.valueOf(LocalDateTime.now()));
 
-            return CommonTemplateMethod.simpleSaveTryCatchObjectReturn(blogPostRepository, post);
+            return blogPostRepository.saveAndFlush(post);
         } else {
             throw new NoResultException("Post does not exist.");
         }

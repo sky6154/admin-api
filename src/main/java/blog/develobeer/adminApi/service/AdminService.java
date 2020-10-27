@@ -6,7 +6,6 @@ import blog.develobeer.adminApi.domain.admin.role.AdminRole;
 import blog.develobeer.adminApi.domain.admin.user.Admin;
 import blog.develobeer.adminApi.domain.admin.user.AdminDetails;
 import blog.develobeer.adminApi.utils.AdminContext;
-import blog.develobeer.adminApi.utils.CommonTemplateMethod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -75,7 +74,14 @@ public class AdminService implements UserDetailsService, Serializable {
     }
 
     public boolean addAdminRole(List<AdminRole> adminRoleList) {
-        return CommonTemplateMethod.simpleSaveTryCatchBooleanReturn(adminRoleRepository, adminRoleList);
+        try {
+            adminRoleRepository.saveAll(adminRoleList);
+            adminRoleRepository.flush();
+            return true;
+        }
+        catch (Exception e){
+            return false;
+        }
     }
 
     public List<Admin> getAllAdminList() {
@@ -89,7 +95,7 @@ public class AdminService implements UserDetailsService, Serializable {
             Admin admin = optionalAdmin.get();
 
             admin.setPwd(passwordEncoder.encode(newPassword));
-            adminRepository.save(admin);
+            adminRepository.saveAndFlush(admin);
 
             return true;
         } else {
