@@ -1,15 +1,11 @@
 package blog.develobeer.adminApi.dao.admin.role;
 
 import blog.develobeer.adminApi.domain.admin.role.AdminRole;
-import blog.develobeer.adminApi.domain.admin.role.AdminRoleId;
 import blog.develobeer.adminApi.domain.admin.role.QAdminRole;
-import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 
 import static blog.develobeer.adminApi.domain.admin.role.QAdminRole.adminRole;
