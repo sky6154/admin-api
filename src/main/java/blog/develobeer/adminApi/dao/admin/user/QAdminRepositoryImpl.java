@@ -1,14 +1,12 @@
 package blog.develobeer.adminApi.dao.admin.user;
 
 import blog.develobeer.adminApi.domain.admin.user.Admin;
-import com.querydsl.core.Tuple;
+import blog.develobeer.adminApi.domain.admin.user.QAdmin;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import static blog.develobeer.adminApi.domain.admin.role.QAdminRole.adminRole;
 import static blog.develobeer.adminApi.domain.admin.role.QRole.role1;
@@ -25,24 +23,9 @@ public class QAdminRepositoryImpl implements QAdminRepository {
 
     @Override
     public List<Admin> getAdminList() {
-        List<Tuple> result = adminQueryFactory.select(admin, role1)
+        return adminQueryFactory.select(QAdmin.create(admin.id, admin.pwd, admin.description, admin.name, admin.isActive, admin.email, role1, admin.modifyDate, admin.regDate))
                 .from(admin, role1, adminRole)
                 .where(admin.seq.eq(adminRole.adminRoleId.userSeq).and(adminRole.adminRoleId.roleId.eq(role1.roleId)))
                 .fetch();
-
-        List<Admin> adminList = new ArrayList<>();
-
-        for (Tuple row : result) {
-            Admin res = row.get(admin);
-            res.setRole(row.get(role1));
-
-            if (Objects.nonNull(res.getPwd())) {
-                res.setPwd(null);
-            }
-
-            adminList.add(res);
-        }
-
-        return adminList;
     }
 }

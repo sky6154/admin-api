@@ -1,6 +1,7 @@
 package blog.develobeer.adminApi.domain.admin.user;
 
 import blog.develobeer.adminApi.domain.admin.role.Role;
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -19,6 +20,21 @@ import java.sql.Timestamp;
 public class Admin implements Serializable {
 
     private static final long serialVersionUID = 4987321495242877070L;
+
+    public Admin(){}
+
+    @QueryProjection
+    public Admin(String id, String pwd, String description, String name, boolean isActive, String email, Role role, Timestamp modifyDate, Timestamp regDate) {
+        this.id = id;
+        this.pwd = pwd;
+        this.description = description;
+        this.name = name;
+        this.isActive = isActive;
+        this.email = email;
+        this.role = role;
+        this.modifyDate = modifyDate;
+        this.regDate = regDate;
+    }
 
     @Id
     @Column
