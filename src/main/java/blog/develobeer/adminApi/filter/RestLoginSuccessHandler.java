@@ -1,6 +1,6 @@
 package blog.develobeer.adminApi.filter;
 
-import blog.develobeer.adminApi.domain.admin.user.AuthenticationToken;
+import blog.develobeer.adminApi.domain.admin.user.LoginResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -26,7 +26,7 @@ public class RestLoginSuccessHandler implements AuthenticationSuccessHandler {
         Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        String json = mapper.writeValueAsString(new AuthenticationToken(username, authorities));
+        String json = mapper.writeValueAsString(new LoginResult(username, authorities));
 
         response.setStatus(HttpStatus.OK.value());
         response.getWriter().write(json);
