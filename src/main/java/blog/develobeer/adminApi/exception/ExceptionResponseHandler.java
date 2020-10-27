@@ -1,6 +1,7 @@
 package blog.develobeer.adminApi.exception;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -9,6 +10,12 @@ import java.io.IOException;
 
 @ControllerAdvice("blog.develobeer")
 public class ExceptionResponseHandler {
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity noResultExceptionHandler(UsernameNotFoundException e) {
+        e.printStackTrace();
+        return ResponseEntity.badRequest().build();
+    }
 
     @ExceptionHandler(NoResultException.class)
     public ResponseEntity noResultExceptionHandler(NoResultException ne) {
