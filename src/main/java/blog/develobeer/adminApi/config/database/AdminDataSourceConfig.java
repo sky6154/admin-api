@@ -33,6 +33,7 @@ public class AdminDataSourceConfig implements Serializable {
         props.put("hibernate.show_sql", true);
         props.put("hibernate.database_platform", "org.hibernate.dialect.MySQL5InnoDBDialect");
         props.put("hibernate.hbm2ddl.auto", "none");
+        props.put("hibernate.format_sql", "true");
 
         return props;
     }

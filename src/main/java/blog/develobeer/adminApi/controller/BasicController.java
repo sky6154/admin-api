@@ -1,5 +1,6 @@
 package blog.develobeer.adminApi.controller;
 
+import blog.develobeer.adminApi.utils.AdminContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,7 +27,7 @@ public class BasicController {
     @RequestMapping(value = "/getAuthorities", method = RequestMethod.GET)
     public ResponseEntity<Collection> getAuthorities() {
         try {
-            return ResponseEntity.ok(SecurityContextHolder.getContext().getAuthentication().getAuthorities());
+            return ResponseEntity.ok(AdminContext.getAuthorities());
         } catch (Exception e) {
 //            e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);

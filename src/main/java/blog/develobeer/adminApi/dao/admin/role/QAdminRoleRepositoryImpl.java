@@ -24,8 +24,13 @@ public class QAdminRoleRepositoryImpl implements QAdminRoleRepository {
     @Override
     public List<AdminRole> getAdminRolesByUserId(String id) {
         return adminQueryFactory.select(QAdminRole.create(adminRole.adminRoleId, admin.id, role1.role, adminRole.regDate))
-                .from(admin, role1, adminRole)
-                .where(admin.id.eq(id).and(admin.seq.eq(adminRole.adminRoleId.userSeq)).and(adminRole.adminRoleId.roleId.eq(role1.roleId)))
+                .from(admin)
+                .join(adminRole)
+                    .on(admin.seq.eq(adminRole.adminRoleId.userSeq))
+                .join(role1)
+                    .on(adminRole.adminRoleId.roleId.eq(role1.roleId))
+                .where(
+                        admin.id.eq(id))
                 .fetch();
     }
 }
