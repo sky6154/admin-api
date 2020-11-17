@@ -1,7 +1,7 @@
 package blog.develobeer.adminApi.service;
 
-import blog.develobeer.adminApi.dao.admin.role.AdminRoleRepository;
-import blog.develobeer.adminApi.dao.admin.user.AdminRepository;
+import blog.develobeer.adminApi.repo.admin.role.AdminRoleRepository;
+import blog.develobeer.adminApi.repo.admin.user.AdminRepository;
 import blog.develobeer.adminApi.domain.admin.role.AdminRole;
 import blog.develobeer.adminApi.domain.admin.user.Admin;
 import blog.develobeer.adminApi.domain.admin.user.AdminDetails;

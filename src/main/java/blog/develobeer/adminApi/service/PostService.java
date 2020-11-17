@@ -1,6 +1,6 @@
 package blog.develobeer.adminApi.service;
 
-import blog.develobeer.adminApi.dao.blog.BlogPostRepository;
+import blog.develobeer.adminApi.repo.blog.BlogPostRepository;
 import blog.develobeer.adminApi.domain.blog.BlogPost;
 import blog.develobeer.adminApi.utils.AdminContext;
 import blog.develobeer.adminApi.utils.CommonTemplateMethod;

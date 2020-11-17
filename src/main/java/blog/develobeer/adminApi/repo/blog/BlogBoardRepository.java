@@ -1,4 +1,4 @@
-package blog.develobeer.adminApi.dao.blog;
+package blog.develobeer.adminApi.repo.blog;
 
 import blog.develobeer.adminApi.domain.blog.BlogBoard;
 import org.springframework.data.jpa.repository.JpaRepository;

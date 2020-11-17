@@ -24,7 +24,7 @@ import java.util.Map;
 @EnableJpaRepositories(
         entityManagerFactoryRef = "adminEntityManagerFactory",
         transactionManagerRef = "adminTransactionManager",
-        basePackages = {"blog.develobeer.adminApi.dao.admin"})
+        basePackages = {"blog.develobeer.adminApi.repo.admin"})
 public class AdminDataSourceConfig implements Serializable {
     private static final long serialVersionUID = -2308261361241623735L;
 

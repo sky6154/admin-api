@@ -14,8 +14,6 @@ public class DevelobeerCsrfTokenRepo {
         this.httpSessionCsrfTokenRepository.setSessionAttributeName(CSRF_SESSION_ATTR);
         this.httpSessionCsrfTokenRepository.setHeaderName(CSRF_SESSION_HEADER);
         this.httpSessionCsrfTokenRepository.setParameterName(CSRF_SESSION_PARAM);
-//        this.cookieCsrfTokenRepository.setCookieHttpOnly(true);
-//        this.cookieCsrfTokenRepository.setCookieName(CSRF_COOKIE_ATTR);
     }
 
     public HttpSessionCsrfTokenRepository getCsrfTokenRepo() {
