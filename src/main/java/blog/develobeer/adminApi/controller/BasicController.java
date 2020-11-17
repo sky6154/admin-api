@@ -12,11 +12,6 @@ import java.util.Collection;
 @RestController
 @RequestMapping("/")
 public class BasicController {
-
-    public BasicController() {
-
-    }
-
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String home() {
         return "HELLO WORLD";

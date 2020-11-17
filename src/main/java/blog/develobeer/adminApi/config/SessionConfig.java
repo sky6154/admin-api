@@ -33,12 +33,12 @@ public class SessionConfig {
     private int redisPort;
 
     private final Environment env;
+    static final String SESSION_COOKIE = "DEVELOBEER-SESSION";
 
 
     @Autowired
     public SessionConfig(Environment env) {
         this.env = env;
-//        this.sessionRepository = sessionRepository;
     }
 
     @Bean
@@ -73,7 +73,7 @@ public class SessionConfig {
         CookieHttpSessionIdResolver resolver = new CookieHttpSessionIdResolver();
         DefaultCookieSerializer cookieSerializer = new DefaultCookieSerializer();
         cookieSerializer.setUseBase64Encoding(false);
-        cookieSerializer.setCookieName("DEVELOBEER-SESSION");
+        cookieSerializer.setCookieName(SESSION_COOKIE);
         cookieSerializer.setUseHttpOnlyCookie(true);
         cookieSerializer.setUseSecureCookie(true);
 

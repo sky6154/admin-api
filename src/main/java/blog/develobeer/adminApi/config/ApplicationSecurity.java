@@ -16,11 +16,13 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.session.FindByIndexNameSessionRepository;
+import org.springframework.session.Session;
 import org.springframework.session.security.SpringSessionBackedSessionRegistry;
 
 import java.util.ArrayList;
@@ -53,40 +55,41 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
-                .httpBasic()
-                .disable()
-                .csrf()
-                .csrfTokenRepository(getCsrfTokenRepo()).ignoringAntMatchers("/login")
-                .and()
-                .sessionManagement()
-                .enableSessionUrlRewriting(false)
-                .maximumSessions(1)
-                .maxSessionsPreventsLogin(false)
-                .sessionRegistry(this.sessionRegistry())
-                .expiredSessionStrategy(new RestSessionExpiredStrategy())
-                .and()
-                .sessionFixation().changeSessionId()
-                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                .and()
-                .addFilterAt(this.restUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-                .authorizeRequests()
-                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .antMatchers("/", "/login", "/logout", "/error").permitAll()
-                .antMatchers("/getAuthorities").hasAnyAuthority("ROLE_BLOG", "ROLE_ADMIN", "ROLE_ETC")
-                .antMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
-                .antMatchers("/post/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_BLOG")
-                .antMatchers("/board/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_BLOG")
-                .anyRequest().authenticated()
-                .and()
-                .exceptionHandling()
-                .authenticationEntryPoint(restAuthenticationEntryPoint)
-                .and()
-                .logout()
-                .logoutUrl("/logout")
-                .deleteCookies("DEVELOBEER-SESSION")
-                .invalidateHttpSession(true)
-                .logoutSuccessHandler(new RestLogoutSuccessHandler());
+            http
+                    .httpBasic().disable()
+                    .sessionManagement()
+                    .enableSessionUrlRewriting(false)
+                    .maximumSessions(1)
+                    .maxSessionsPreventsLogin(false)
+                    .sessionRegistry(this.sessionRegistry())
+                    .expiredSessionStrategy(new RestSessionExpiredStrategy())
+                    .and()
+                    .sessionFixation().changeSessionId()
+                    .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                    .and()
+                    .addFilterAt(this.restUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                    .authorizeRequests()
+                    .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                    .antMatchers("/", "/login", "/logout", "/error").permitAll()
+                    .antMatchers("/getAuthorities").hasAnyAuthority("ROLE_BLOG", "ROLE_ADMIN", "ROLE_ETC")
+                    .antMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
+                    .antMatchers("/post/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_BLOG")
+                    .antMatchers("/board/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_BLOG")
+                    .anyRequest().authenticated()
+                    .and()
+                    .exceptionHandling()
+                    .authenticationEntryPoint(restAuthenticationEntryPoint)
+                    .and()
+                    .logout()
+                    .logoutUrl("/logout")
+                    .clearAuthentication(true)
+                    .deleteCookies(SessionConfig.SESSION_COOKIE)
+                    .invalidateHttpSession(true)
+                    .logoutSuccessHandler(new RestLogoutSuccessHandler())
+                    .and()
+                    .csrf()
+                    .csrfTokenRepository(getCsrfTokenRepo())
+                    .ignoringAntMatchers("/login");
     }
 
     private RestUsernamePasswordAuthenticationFilter restUsernamePasswordAuthenticationFilter() {
@@ -101,7 +104,7 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public SpringSessionBackedSessionRegistry sessionRegistry() {
+    public SpringSessionBackedSessionRegistry<Session> sessionRegistry() {
         return new SpringSessionBackedSessionRegistry<>(this.sessionRepository);
     }
 
@@ -133,7 +136,7 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public HttpSessionCsrfTokenRepository getCsrfTokenRepo() {
+    public CookieCsrfTokenRepository getCsrfTokenRepo() {
         return new DevelobeerCsrfTokenRepo().getCsrfTokenRepo();
     }
 
